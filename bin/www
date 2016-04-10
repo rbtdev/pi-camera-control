@@ -1,0 +1,235 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('pi-control:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+var io = require('socket.io')(server);
+var ioClient = require('socket.io-client');
+
+
+/**
+ * create socket server
+ */
+var io = require('socket.io')(server);
+var controllerIo = io.of('/controller');
+var cameraIo = io.of('/camera');
+
+function Cameras () {
+  this.id = 0;
+  this._cameras = {};
+}
+
+Cameras.prototype.add = function (camera) {
+  camera.id = this.id;
+  this._cameras[this.id.toString()] = camera;
+  this.id++;
+}
+
+Cameras.prototype.findById = function (id) {
+  return this._cameras[id];
+}
+
+Cameras.prototype.findBySocket = function (socket) {
+  for (var cameraId in this._cameras) {
+    if (this._cameras[cameraId].socket === socket) {
+      return (this._cameras[cameraId]);
+    }
+  }
+}
+
+Cameras.prototype.remove = function (camera) {
+  if (this._cameras[camera.id]) {
+    delete (this._cameras[camera.id]);
+  }
+  else {
+    console.log("Cannot remove camera: " + camera)
+  }
+}
+Cameras.prototype.toArray = function () {
+  var array = [];
+
+  for (var cameraId in this._cameras) {
+    array.push({id: cameraId, name: this._cameras[cameraId].name});
+  }
+  return array;
+}
+
+function Camera (name, socket) {
+  this.name = name;
+  this.socket = socket;
+}
+
+var Cameras = new Cameras();
+var controller = null;
+
+controllerIo.on('connection', function (socket) {
+  console.log("Controller connected...");
+  controller = socket;
+
+  socket.on('activate', function(message) {
+    console.log("Got activate event");
+    var camera = Cameras.findById(message.id);
+    if (camera) {
+      camera.socket.emit('activate');
+    }
+    else {
+      console.log("Err- no such camera");
+      socket.send({err: "no such camera"})
+    }
+  });
+
+  socket.on('deactivate', function (message) {
+      console.log("got deactivate event");
+      var camera = Cameras.findById(message.id);
+      if (camera) {
+        camera.socket.emit('activate');
+      }
+      else {
+        console.log("Err- no such camera");
+        socket.send({err: "no such camera"})
+      }
+  });
+  socket.on('disconnect', function () {
+
+  })
+
+  console.log("Send camera list...");
+  controller.emit('list', Cameras.toArray())
+})
+
+cameraIo.on('connection', function (socket) {
+  console.log('Camera connected...');
+  socket.on('register', function (message) {
+    console.log("Got register event.");
+    console.log(message);
+    var name = message.name;
+    var camera = new Camera(name, socket);
+    Cameras.add(camera);
+    console.log("Sending list event");
+    if (controller) {
+      controller.emit('list', Cameras.toArray())
+    }
+  });
+
+  socket.on('disconnect', function () {
+    var camera = Cameras.findBySocket(socket);
+    if (camera) {
+      Cameras.remove(camera);
+    }
+    else {
+      console.log("Unable to remove camera from collection");
+    }
+    console.log("Camera disconnected...");
+  });
+});
+
+console.log("Initiating connecetions in 5 seconds");
+setTimeout(function () {
+        var maxCameras = 5;
+        var cameras = [];
+        setTimeout(addCamera, 1000);
+
+        function addCamera () {
+            console.log("Adding camera...");
+            var camera = ioClient.connect('http://localhost:5000/camera');
+            cameras.push(camera);
+            camera.on('connect', function (socket) {
+                var name = "Camera " + cameras.length;
+                console.log("Camera connected, registering " + name);
+                camera.emit('register', {name: name})
+            });
+            if (cameras.length < maxCameras) {
+              setTimeout(addCamera, 1000);
+            }
+            else {
+              console.log("Done adding cameras.");
+            }
+        }
+
+}, 5000);
+
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
