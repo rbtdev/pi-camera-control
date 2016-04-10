@@ -1,47 +1,29 @@
-<!doctype html>  
-<html lang="en">  
+<!DOCTYPE html>
+<html lang="en">
     <head>
-
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
-        <h1>Remote Camera Control</h1>
-        <div id = "cameras"></div>      
+        <div class="container-fluid">
+            <div class="row">
+                <h1>Remote Camera Control</h1>
+                <div id = "cameras" class="col-xs-12">
+                    
+                </div>   
+            </div>   
+        </div>
     </body>
-    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>  
-        var control = io.connect('/controller');
-        control.on('connect', function(socket) {
-            console.log("Controller connected");
-        });
-        control.on('status', function (status) {
-            console.log("Got status for " + status.id + " - " + status.active)
-            cameraList[parseInt(status.id)].active = status.active;
-            listCameras(cameraList);
-        })
-        control.on('list', function (cameras) {
-            cameraList = cameras;
-            listCameras(cameras);
-        });
-        function listCameras(cameras) {
-            var $cameraList = $("<ul>", {id: "camera-list"});
-            cameras.forEach(function (camera) {
-                var $camera = $("<li>", {text: camera.name});
-                var $button = $("<button>", {text: camera.active?"Disable":"Enable", 'data-camera-id': camera.id})
-                $button.click(toggleStatus);
-                $camera.append($button);
-                $cameraList.append($camera)          
-            })
-            $('#camera-list').remove();
-            $('#cameras').append($cameraList);
-        }
-
-        function toggleStatus(evt) {
-            var cameraId = this.dataset.cameraId;
-            var event = cameraList[cameraId].active?'deactivate':'activate';
-            control.emit(event, {id: cameraId});
-            return false;
-        }
-
-    </script>
+    <script src="/javascripts/controller.js"></script> 
 </html>  
