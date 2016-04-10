@@ -1,35 +1,38 @@
 var ioClient = require('socket.io-client');
 
-var active = false;
-var socket = null;
 
-function PiCam(name) {
-	var _this = this;
-	console.log("Starting PiCam in 5 seconds: " + name);
-	setTimeout(function () {ioClient.connect(process.env.CAMERA_SOCKET_ENDPOINT);
-		socket = ioClient.connect(process.env.CAMERA_SOCKET_ENDPOINT);
-	    socket.on('connect', function () {
-	      	socket.on('activate', activate);
-	   		socket.on('deactivate', deactivate);
-	        console.log("Camera connected, registering " + name);
-	        socket.emit('register', {name: name})
-	        socket.emit('status', {active: active});
-	    });
-	}, 5000);
+function PiCam (name) {
+
+	this.active = false;
+	this.socket = null;
+	this.name = name;
 }
 
-function activate() {
+PiCam.prototype.connect = function () {
+	var _this = this;
+	this.socket = ioClient.connect(process.env.CAMERA_SOCKET_ENDPOINT);
+	this.socket.on('connect', onConnect.bind(this))
+}
+
+function onConnect () {
+	this.socket.on('activate', onActivate.bind(this));
+	this.socket.on('deactivate', onDeactivate.bind(this));
+	console.log("Camera connected, registering " + this.name);
+	this.socket.emit('register', {name: this.name})
+	this.socket.emit('status', {active: this.active});	
+}
+function onActivate () {
 	console.log("PiSim: Turning motion detection system on");
 	// do all the stuff to enable motion detection
-	active = true
-	socket.emit('status', {active: active});
+	this.active = true
+	this.socket.emit('status', {active: this.active});
 }
 
-function deactivate() {
+function onDeactivate () {
 	console.log("PiSim: Turning motion detection system off");
 	// disable motion detection
-	active = false;
-	socket.emit('status', {active: active});
+	this.active = false;
+	this.socket.emit('status', {active: this.active});
 }
 
 
