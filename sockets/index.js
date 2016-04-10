@@ -124,14 +124,4 @@ module.exports = function (server) {
     }
   }
 
- var PiSim = require('../pi-sim');
- setTimeout(function () {
-  new PiSim('camera1').connect();
-  new PiSim('camera2').connect();
-  new PiSim('camera3').connect();
-  new PiSim('camera4').connect();
-  new PiSim('camera5').connect();
-  new PiSim('camera6').connect();
- }, 5000)
-
 }
