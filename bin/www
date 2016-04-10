@@ -148,7 +148,7 @@ setTimeout(function () {
 
         function addCamera () {
             console.log("Adding camera...");
-            var camera = ioClient.connect('http://localhost:5000/camera');
+            var camera = ioClient.connect(process.env.CAMERA_SOCKET_ENDPOINT);
             cameras.push(camera);
             camera.on('connect', function (socket) {
                 var name = "Camera " + cameras.length;
