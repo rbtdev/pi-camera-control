@@ -14,19 +14,38 @@
         control.on('connect', function(socket) {
             console.log("Controller connected");
         });
+        control.on('status', function (status) {
+            console.log("Got status for " + status.id + " - " + status.active)
+            cameraList[parseInt(status.id)].active = status.active;
+            listCameras(cameraList);
+        })
         control.on('list', function (cameras) {
+            cameraList = cameras;
             console.log("Got list event");
             console.log(cameras);
             listCameras(cameras);
+            cameras.forEach(function (camera) {
+                control.emit('activate', {id: camera.id});
+            })
         });
         function listCameras(cameras) {
             var $cameraList = $("<ul>", {id: "camera-list"});
             cameras.forEach(function (camera) {
-                var $camera = $("<li>", {id: "camera-" + camera.id, text: camera.name});
+                var $camera = $("<li>", {text: camera.name});
+                var $button = $("<button>", {text: camera.active?"Disable":"Enable", 'data-camera-id': camera.id})
+                $button.click(toggleStatus);
+                $camera.append($button);
                 $cameraList.append($camera)          
             })
             $('#camera-list').remove();
             $('#cameras').append($cameraList);
+        }
+
+        function toggleStatus(evt) {
+            var cameraId = this.dataset.cameraId;
+            var event = cameraList[cameraId].active?'deactivate':'activate';
+            control.emit(event, {id: cameraId});
+            return false;
         }
 
     </script>

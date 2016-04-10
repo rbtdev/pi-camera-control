@@ -21,7 +21,6 @@ app.set('port', port);
 
 var server = http.createServer(app);
 var io = require('socket.io')(server);
-var ioClient = require('socket.io-client');
 
 
 /**
@@ -74,6 +73,7 @@ Cameras.prototype.toArray = function () {
 function Camera (name, socket) {
   this.name = name;
   this.socket = socket;
+  this.active = false;
 }
 
 var Cameras = new Cameras();
@@ -99,7 +99,7 @@ controllerIo.on('connection', function (socket) {
       console.log("got deactivate event");
       var camera = Cameras.findById(message.id);
       if (camera) {
-        camera.socket.emit('activate');
+        camera.socket.emit('deactivate');
       }
       else {
         console.log("Err- no such camera");
@@ -116,18 +116,8 @@ controllerIo.on('connection', function (socket) {
 
 cameraIo.on('connection', function (socket) {
   console.log('Camera connected...');
-  socket.on('register', function (message) {
-    console.log("Got register event.");
-    console.log(message);
-    var name = message.name;
-    var camera = new Camera(name, socket);
-    Cameras.add(camera);
-    console.log("Sending list event");
-    if (controller) {
-      controller.emit('list', Cameras.toArray())
-    }
-  });
-
+  socket.on('register', registerCamera(socket));
+  socket.on('status', updateStatus(socket));
   socket.on('disconnect', function () {
     var camera = Cameras.findBySocket(socket);
     if (camera) {
@@ -140,32 +130,29 @@ cameraIo.on('connection', function (socket) {
   });
 });
 
-console.log("Initiating connecetions in 5 seconds");
-setTimeout(function () {
-        var maxCameras = 5;
-        var cameras = [];
-        setTimeout(addCamera, 1000);
+function updateStatus (socket) {
+  return function (message) {
+    var camera = Cameras.findBySocket(socket);
+    console.log("Got status update: active = " + message.active + " for camera: " + camera.name);
+    controller.emit('status', {id: camera.id, active: message.active})
+  }
+}
 
-        function addCamera () {
-            console.log("Adding camera...");
-            var camera = ioClient.connect(process.env.CAMERA_SOCKET_ENDPOINT);
-            cameras.push(camera);
-            camera.on('connect', function (socket) {
-                var name = "Camera " + cameras.length;
-                console.log("Camera connected, registering " + name);
-                camera.emit('register', {name: name})
-            });
-            if (cameras.length < maxCameras) {
-              setTimeout(addCamera, 1000);
-            }
-            else {
-              console.log("Done adding cameras.");
-            }
-        }
+function registerCamera (socket) {
+  return function (message) {
+    console.log("Got register event.");
+    console.log(message);
+    var name = message.name;
+    var camera = new Camera(name, socket);
+    Cameras.add(camera);
+    console.log("Sending list event");
+    if (controller) {
+      controller.emit('list', Cameras.toArray())
+    }
+  }
+}
 
-}, 5000);
-
-
+new require('../pi-sim')("pi-cam");
 /**
  * Listen on provided port, on all network interfaces.
  */
