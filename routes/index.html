@@ -21,12 +21,7 @@
         })
         control.on('list', function (cameras) {
             cameraList = cameras;
-            console.log("Got list event");
-            console.log(cameras);
             listCameras(cameras);
-            cameras.forEach(function (camera) {
-                control.emit('activate', {id: camera.id});
-            })
         });
         function listCameras(cameras) {
             var $cameraList = $("<ul>", {id: "camera-list"});

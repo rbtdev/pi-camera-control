@@ -38,7 +38,7 @@ module.exports = function (server) {
     var array = [];
 
     for (var cameraId in this._cameras) {
-      array.push({id: cameraId, name: this._cameras[cameraId].name});
+      array.push({id: cameraId, name: this._cameras[cameraId].name, active: this._cameras[cameraId].active});
     }
     return array;
   }
@@ -84,7 +84,7 @@ module.exports = function (server) {
     })
 
     console.log("Send camera list...");
-    controller.emit('list', Cameras.toArray())
+    if (controller) controller.emit('list', Cameras.toArray())
   })
 
   cameraIo.on('connection', function (socket) {
@@ -106,8 +106,9 @@ module.exports = function (server) {
   function updateStatus (socket) {
     return function (message) {
       var camera = Cameras.findBySocket(socket);
+      camera.active = message.active;
       console.log("Got status update: active = " + message.active + " for camera: " + camera.name);
-      controller.emit('status', {id: camera.id, active: message.active})
+      if (controller) controller.emit('status', {id: camera.id, active: camera.active})
     }
   }
 
@@ -119,9 +120,7 @@ module.exports = function (server) {
       var camera = new Camera(name, socket);
       Cameras.add(camera);
       console.log("Sending list event");
-      if (controller) {
-        controller.emit('list', Cameras.toArray())
-      }
+      if (controller) controller.emit('list', Cameras.toArray())
     }
   }
 
