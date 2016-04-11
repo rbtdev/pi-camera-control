@@ -1,55 +1,12 @@
-module.exports = function (server) {
-  var io = require('socket.io')(server);
+
+var socketIo = require('socket.io');
+var Cameras = require('./cameras.js');
+
+function init(server) {
+  var io = socketIo(server);
   var controllerIo = io.of('/controller');
-  var cameraIo = io.of('/camera');
+  var cameraIo = io.of('/camera');  
 
-  function Cameras () {
-    this.id = 0;
-    this._cameras = {};
-  }
-
-  Cameras.prototype.add = function (camera) {
-    camera.id = this.id;
-    this._cameras[this.id.toString()] = camera;
-    this.id++;
-  }
-
-  Cameras.prototype.findById = function (id) {
-    return this._cameras[id];
-  }
-
-  Cameras.prototype.findBySocket = function (socket) {
-    for (var cameraId in this._cameras) {
-      if (this._cameras[cameraId].socket === socket) {
-        return (this._cameras[cameraId]);
-      }
-    }
-  }
-
-  Cameras.prototype.remove = function (camera) {
-    if (this._cameras[camera.id]) {
-      delete (this._cameras[camera.id]);
-    }
-    else {
-      console.log("Cannot remove camera: " + camera)
-    }
-  }
-  Cameras.prototype.toArray = function () {
-    var array = [];
-
-    for (var cameraId in this._cameras) {
-      array.push({id: cameraId, name: this._cameras[cameraId].name, active: this._cameras[cameraId].active});
-    }
-    return array;
-  }
-
-  function Camera (name, socket) {
-    this.name = name;
-    this.socket = socket;
-    this.active = false;
-  }
-
-  var Cameras = new Cameras();
   var controller = null;
 
   controllerIo.on('connection', function (socket) {
@@ -84,7 +41,7 @@ module.exports = function (server) {
     })
 
     console.log("Send camera list...");
-    if (controller) controller.emit('list', Cameras.toArray())
+    if (controller) controller.emit('list', Cameras.list())
   })
 
   cameraIo.on('connection', function (socket) {
@@ -95,10 +52,11 @@ module.exports = function (server) {
     socket.on('disconnect', function () {
       var camera = Cameras.findBySocket(socket);
       if (camera) {
-        Cameras.remove(camera);
+        camera.setStatus('offline');
+        if (controller) controller.emit('list', Cameras.list())
       }
       else {
-        console.log("Unable to remove camera from collection");
+        console.log("Unable to find camera in collection");
       }
       console.log("Camera disconnected...");
     });
@@ -113,21 +71,22 @@ module.exports = function (server) {
   function updateStatus (socket) {
     return function (message) {
       var camera = Cameras.findBySocket(socket);
-      camera.active = message.active;
-      console.log("Got status update: active = " + message.active + " for camera: " + camera.name);
-      if (controller) controller.emit('status', {id: camera.id, active: camera.active})
+      camera.status = message.status;
+      console.log("Got status update: status = " + message.status + " for camera: " + camera.name);
+      if (controller) controller.emit('status', {id: camera.id, status: camera.status})
     }
   }
 
   function registerCamera (socket) {
-    return function (message) {
+    return function (camera) {
       console.log("Got register event.");
-      console.log(message);
-      var name = message.name;
-      var camera = new Camera(name, socket);
-      Cameras.add(camera);
+      console.log(camera);
+      Cameras.add({name: camera.name, id: camera.id, socket: socket});
       console.log("Sending list event");
-      if (controller) controller.emit('list', Cameras.toArray())
+      if (controller) controller.emit('list', Cameras.list())
     }
   }
-};
+}
+
+
+module.exports = init;

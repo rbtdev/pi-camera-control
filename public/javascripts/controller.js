@@ -2,13 +2,30 @@ var control = io.connect('/controller');
 
 function listCameras(cameras) {
     var $cameraList = $("<div>", {id: "camera-list"});
-    cameras.forEach(function (camera) {
+    var buttonStatus = {
+        'offline': {
+            class: 'btn-warning',
+            text: 'Off Line'
+        },
+
+        'active': {
+            class: 'btn-success',
+            text: 'ON'
+        },
+
+        'disabled': {
+            class: 'btn-danger',
+            text: "OFF"
+        }
+    }
+    for (cameraId in cameras) {
+        var camera = cameras[cameraId];
         var $cameraRow = $("<div>", {class: "row"});
         var $cameraName = $("<div>", {text: camera.name, class: "col-xs-3 name"});
         var $buttonCol = $("<div>", {class: "col-xs-3 col-sm-2 col-md-1 col-lg-1"});
-        var btnStatus = camera.active?"btn-success":"btn-danger";
+        var btnStatus = buttonStatus[camera.status].class;
         var btnClass = "btn btn-block " + btnStatus;
-        var btnText = camera.active?"ON":"OFF";
+        var btnText = buttonStatus[camera.status].text;
         var $imgCol = $("<div>", {class: "col-xs-4 image"});
         var $img = $("<img>", {id: "camera-img-" + camera.id})
         var $cameraButton = $("<button>", {type: "button", class: btnClass, text: btnText, 'data-camera-id': camera.id})
@@ -19,14 +36,14 @@ function listCameras(cameras) {
         $cameraRow.append($buttonCol);
         $cameraRow.append($imgCol);
         $cameraList.append($cameraRow)          
-    })
+    }
     $('#camera-list').remove();
     $('#cameras').append($cameraList);
 }
 
 function toggleStatus(evt) {
     var cameraId = this.dataset.cameraId;
-    var event = cameraList[cameraId].active?'deactivate':'activate';
+    var event = (cameraList[cameraId].status=='active')?'deactivate':'activate';
     control.emit(event, {id: cameraId});
     return false
 }
@@ -40,8 +57,8 @@ control
         console.log("Controller connected");
     })
     .on('status', function (status) {
-        console.log("Got status for " + status.id + " - " + status.active)
-        cameraList[parseInt(status.id)].active = status.active;
+        console.log("Got status for " + status.id + " - " + status.status)
+        cameraList[status.id].status = status.status;
         listCameras(cameraList);
     })
     .on('alarm', function (alarm) {
