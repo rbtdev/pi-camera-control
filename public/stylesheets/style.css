@@ -2,3 +2,10 @@
 #camera-list .row {
 	margin:10px;
 }
+
+#camera-list .name {
+	text-transform: uppercase;
+	font-style: italic;
+	font-size: larger;
+	font-weight: bold;
+}

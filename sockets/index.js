@@ -91,6 +91,7 @@ module.exports = function (server) {
     console.log('Camera connected...');
     socket.on('register', registerCamera(socket));
     socket.on('status', updateStatus(socket));
+    socket.on('image', sendImage(socket));
     socket.on('disconnect', function () {
       var camera = Cameras.findBySocket(socket);
       if (camera) {
@@ -103,6 +104,12 @@ module.exports = function (server) {
     });
   });
 
+  function sendImage (socket) {
+    return function (image) {
+      var camera = Cameras.findBySocket(socket);
+      if (controller) controller.emit('image', {id: camera.id, src: image.src})
+    }
+  }
   function updateStatus (socket) {
     return function (message) {
       var camera = Cameras.findBySocket(socket);
@@ -123,5 +130,4 @@ module.exports = function (server) {
       if (controller) controller.emit('list', Cameras.toArray())
     }
   }
-
-}
+};
