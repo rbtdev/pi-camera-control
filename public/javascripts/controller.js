@@ -86,7 +86,7 @@ function setAlarm(cameraId, alarm) {
     var id = "#camera-"+cameraId;
     var $alarms = $(id).find('.alarms');
     var $alarm = $('<li>', {class: 'alarm', text: alarm.type + " at " + alarm.timestamp});
-    $alarms.append($alarm);
+    $alarms.prepend($alarm);
 }
 
 function setStatus(cameraId, status) {
