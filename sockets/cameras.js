@@ -6,14 +6,19 @@ function Camera (camera) {
   this.socket = camera.socket;
   this.status = 'disabled';
   this.id = camera.id;
+  this.alarms = [];
 };
 
 Camera.prototype.export = function () {
-  return {name: this.name, id: this.id, status: this.status}
+  return {name: this.name, id: this.id, status: this.status, alarms: this.alarms}
 };
 
 Camera.prototype.setStatus = function (status) {
   this.status = status;
+};
+
+Camera.prototype.addAlarm = function (alarm) {
+  this.alarms.push(alarm);
 }
 
 

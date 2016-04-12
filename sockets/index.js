@@ -54,12 +54,12 @@ function init(server) {
     socket.on('register', registerCamera(socket));
     socket.on('status', updateStatus(socket));
     ioStream(socket).on('image', sendImage(socket));
-    //socket.on('motion', sendAlarm(socket, 'motion'));
+    socket.on('alarm', sendAlarm(socket));
     socket.on('disconnect', function () {
       var camera = Cameras.findBySocket(socket);
       if (camera) {
         camera.setStatus('offline');
-        if (controller) controller.emit('list', Cameras.list())
+        if (controller) controller.emit('status', {id: camera.id, status: camera.status})
       }
       else {
         console.log("Unable to find camera in collection");
@@ -68,11 +68,12 @@ function init(server) {
     });
   });
 
-  function sendAlarm(socket, type) {
-    return function () {
-      console.log('Got ' + type + ' alarm. Send to front end.');
+  function sendAlarm(socket) {
+    return function (alarm) {
+      console.log('Got ' + alarm.type + ' alarm at ' + alarm.timestamp + '. Send to front end.');
       var camera = Cameras.findBySocket(socket);
-      if (controller) controller.emit('alarm', {id: camera.id, type: type});
+      camera.addAlarm({type: alarm.type, timestamp: alarm.timestamp})
+      if (controller) controller.emit('alarm', {id: camera.id, type: alarm.type, timestamp: alarm.timestamp});
     }
   };
 

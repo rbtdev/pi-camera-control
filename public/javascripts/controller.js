@@ -1,7 +1,44 @@
-var control = io.connect('/controller');
+var controller = io.connect('/controller');
+var cameraList = {};
 
 function listCameras(cameras) {
+    $('#camera-list').remove();
     var $cameraList = $("<div>", {id: "camera-list"});
+    $('#cameras').append($cameraList);
+
+    for (cameraId in cameras) {
+        var $cameraRow = createCameraRow(cameraId);
+        $cameraList.append($cameraRow)  
+        updateCameraRow(cameraId);       
+    }
+
+}
+
+function createCameraRow(cameraId) {
+    var $cameraRow = $("<div>", {id:"camera-" + cameraId, class: "row"});
+    var $statusRow = $('<div>', {class: 'row'});
+    var $cameraName = $("<div>", {class: "col-xs-3 name"});
+    var $buttonCol = $("<div>", {class: "col-xs-3 col-sm-2 col-md-1 col-lg-1"});
+    var $imgCol = $("<div>", {class: "col-xs-1 image"});
+    var $img = $("<img>", {class: "thumbnail"});
+    var $alarmsRow = $('<div>', {class: 'row'});
+    var $alarms = $('<ul>', {class: 'alarms'});
+    var $cameraButton = $("<button>", {type: "button", class: "status"})
+    $cameraButton.click(toggleStatus);
+    $imgCol.append($img);
+    $buttonCol.append($cameraButton);
+    $alarmsRow.append($alarms);
+    $statusRow.append($cameraName);
+    $statusRow.append($buttonCol);
+    $statusRow.append($imgCol);
+    $cameraRow.append($statusRow);
+    $cameraRow.append($alarmsRow);
+
+    return $cameraRow;
+};
+
+function updateCameraRow(cameraId) {
+    var camera = cameraList[cameraId];
     var buttonStatus = {
         'offline': {
             class: 'btn-warning',
@@ -18,33 +55,23 @@ function listCameras(cameras) {
             text: "OFF"
         }
     }
-    for (cameraId in cameras) {
-        var camera = cameras[cameraId];
-        var $cameraRow = $("<div>", {id:"camera-" + camera.id, class: "row"});
-        var $cameraName = $("<div>", {text: camera.name, class: "col-xs-3 name"});
-        var $buttonCol = $("<div>", {class: "col-xs-3 col-sm-2 col-md-1 col-lg-1"});
-        var btnStatus = buttonStatus[camera.status].class;
-        var btnClass = "btn btn-block " + btnStatus;
-        var btnText = buttonStatus[camera.status].text;
-        var $imgCol = $("<div>", {class: "col-xs-4 image"});
-        var $img = $("<img>", {class: "thumbnail"});
-        var $cameraButton = $("<button>", {type: "button", class: btnClass, text: btnText, 'data-camera-id': camera.id})
-        $cameraButton.click(toggleStatus);
-        $imgCol.append($img);
-        $buttonCol.append($cameraButton);
-        $cameraRow.append($cameraName);
-        $cameraRow.append($buttonCol);
-        $cameraRow.append($imgCol);
-        $cameraList.append($cameraRow)          
-    }
-    $('#camera-list').remove();
-    $('#cameras').append($cameraList);
+
+    var btnStatus = buttonStatus[camera.status].class;
+    var btnClass = "btn btn-block " + btnStatus + " status";
+    var btnText = buttonStatus[camera.status].text;
+    var id = '#camera-' + camera.id;
+    var $cameraRow = $(id);
+    $cameraRow.find('.name').text(camera.name);
+    var $statusBtn = $cameraRow.find('.status');
+    $statusBtn.text(btnText);
+    $statusBtn.attr('data-camera-id', camera.id);
+    $statusBtn.attr('class', btnClass);
 }
 
-function toggleStatus(evt) {
+function toggleStatus() {
     var cameraId = this.dataset.cameraId;
     var event = (cameraList[cameraId].status=='active')?'deactivate':'activate';
-    control.emit(event, {id: cameraId});
+    controller.emit(event, {id: cameraId});
     return false
 }
 
@@ -55,22 +82,32 @@ function setThumbnail(cameraId, src) {
     }).attr("src",src)
 };
 
-function setAlarm(cameraId, type) {
-    var id = "#camera-alarm-" + cameraId;
-    $(id).text('Alarm triggered');
+function setAlarm(cameraId, alarm) {
+    var id = "#camera-"+cameraId;
+    var $alarms = $(id).find('.alarms');
+    var $alarm = $('<li>', {class: 'alarm', text: alarm.type + " at " + alarm.timestamp});
+    $alarms.append($alarm);
 }
-control
+
+function setStatus(cameraId, status) {
+    cameraList[cameraId].status = status;
+    updateCameraRow(cameraId);
+}
+
+/**
+ * Handle socket events
+ */
+controller
     .on('connect', function(socket) {
         console.log("Controller connected");
     })
     .on('status', function (status) {
         console.log("Got status for " + status.id + " - " + status.status)
-        cameraList[status.id].status = status.status;
-        listCameras(cameraList);
+        setStatus(status.id, status.status);
     })
     .on('alarm', function (alarm) {
         console.log("Got alarm signal for camera " + alarm.id + " - " + alarm.type);
-        //setAlarm(alarm.id, alarm.type);
+        setAlarm(alarm.id, alarm);
     })
     .on('image', function (image) {
         console.log("Got image from camera " + image.id);
