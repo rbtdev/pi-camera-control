@@ -1,6 +1,11 @@
 
 var socketIo = require('socket.io');
+var ioStream = require('socket.io-stream');
 var Cameras = require('./cameras.js');
+var path = require('path');
+var fs = require('fs');
+var publicDir = "public";
+var imageDir= "images";
 
 function init(server) {
   var io = socketIo(server);
@@ -48,7 +53,8 @@ function init(server) {
     console.log('Camera connected...');
     socket.on('register', registerCamera(socket));
     socket.on('status', updateStatus(socket));
-    socket.on('image', sendImage(socket));
+    ioStream(socket).on('image', sendImage(socket));
+    socket.on('motion', sendAlarm(socket, 'motion'));
     socket.on('disconnect', function () {
       var camera = Cameras.findBySocket(socket);
       if (camera) {
@@ -62,12 +68,25 @@ function init(server) {
     });
   });
 
-  function sendImage (socket) {
-    return function (image) {
+  function sendAlarm(socket, type) {
+    return function () {
+      console.log('Got ' + type + ' alarm. Send to front end.');
       var camera = Cameras.findBySocket(socket);
-      if (controller) controller.emit('image', {id: camera.id, src: image.src})
+      if (controller) controller.emit('alarm', {id: camera.id, type: type});
     }
-  }
+  };
+
+  function sendImage (socket) {
+    return function(stream, data) {
+      console.log("Got image upload event. Saving image.");
+      var filename = path.basename(data.name);
+      var url = "/" + imageDir + "/" + filename;
+      stream.pipe(fs.createWriteStream(publicDir + "/" + url));
+      var camera = Cameras.findBySocket(socket);
+      if (controller) controller.emit('image', {id: camera.id, src: url})
+    }
+  };
+
   function updateStatus (socket) {
     return function (message) {
       var camera = Cameras.findBySocket(socket);
@@ -75,7 +94,7 @@ function init(server) {
       console.log("Got status update: status = " + message.status + " for camera: " + camera.name);
       if (controller) controller.emit('status', {id: camera.id, status: camera.status})
     }
-  }
+  };
 
   function registerCamera (socket) {
     return function (camera) {

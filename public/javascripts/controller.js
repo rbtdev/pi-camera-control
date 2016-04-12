@@ -51,6 +51,11 @@ function toggleStatus(evt) {
 function setThumbnail(cameraId, src) {
     var id = "#camera-img-" + cameraId;
     $(id).attr("src",src);
+};
+
+function setAlarm(cameraId, type) {
+    var id = "#camera-alarm-" + cameraId;
+    $(id).text('Alarm triggered');
 }
 control
     .on('connect', function(socket) {
@@ -62,7 +67,8 @@ control
         listCameras(cameraList);
     })
     .on('alarm', function (alarm) {
-        console.log("Got alarm signal for camera " + alarm.id + " - " + alarm.message);
+        console.log("Got alarm signal for camera " + alarm.id + " - " + alarm.type);
+        //setAlarm(alarm.id, alarm.type);
     })
     .on('image', function (image) {
         console.log("Got image from camera " + image.id);
