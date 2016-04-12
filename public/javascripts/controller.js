@@ -20,14 +20,14 @@ function listCameras(cameras) {
     }
     for (cameraId in cameras) {
         var camera = cameras[cameraId];
-        var $cameraRow = $("<div>", {class: "row"});
+        var $cameraRow = $("<div>", {id:"camera-" + camera.id, class: "row"});
         var $cameraName = $("<div>", {text: camera.name, class: "col-xs-3 name"});
         var $buttonCol = $("<div>", {class: "col-xs-3 col-sm-2 col-md-1 col-lg-1"});
         var btnStatus = buttonStatus[camera.status].class;
         var btnClass = "btn btn-block " + btnStatus;
         var btnText = buttonStatus[camera.status].text;
         var $imgCol = $("<div>", {class: "col-xs-4 image"});
-        var $img = $("<img>", {id: "camera-img-" + camera.id})
+        var $img = $("<img>", {class: "thumbnail"});
         var $cameraButton = $("<button>", {type: "button", class: btnClass, text: btnText, 'data-camera-id': camera.id})
         $cameraButton.click(toggleStatus);
         $imgCol.append($img);
@@ -49,8 +49,10 @@ function toggleStatus(evt) {
 }
 
 function setThumbnail(cameraId, src) {
-    var id = "#camera-img-" + cameraId;
-    $(id).attr("src",src);
+    var id = "#camera-"+cameraId;
+    $(id).find(".thumbnail").error(function (e) {
+        console.log('image error');
+    }).attr("src",src)
 };
 
 function setAlarm(cameraId, type) {

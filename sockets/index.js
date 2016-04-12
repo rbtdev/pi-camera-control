@@ -54,7 +54,7 @@ function init(server) {
     socket.on('register', registerCamera(socket));
     socket.on('status', updateStatus(socket));
     ioStream(socket).on('image', sendImage(socket));
-    socket.on('motion', sendAlarm(socket, 'motion'));
+    //socket.on('motion', sendAlarm(socket, 'motion'));
     socket.on('disconnect', function () {
       var camera = Cameras.findBySocket(socket);
       if (camera) {
@@ -77,13 +77,16 @@ function init(server) {
   };
 
   function sendImage (socket) {
-    return function(stream, data) {
+    return function(stream, data, cb) {
       console.log("Got image upload event. Saving image.");
       var filename = path.basename(data.name);
       var url = "/" + imageDir + "/" + filename;
-      stream.pipe(fs.createWriteStream(publicDir + "/" + url));
-      var camera = Cameras.findBySocket(socket);
-      if (controller) controller.emit('image', {id: camera.id, src: url})
+      stream.on('finish', function () {
+        var camera = Cameras.findBySocket(socket);
+        console.log("URL = " + url);
+        if (controller) controller.emit('image', {id: camera.id, src: url});
+      });
+      stream.pipe(fs.createWriteStream(publicDir + url, {mode: "0666"}));
     }
   };
 
