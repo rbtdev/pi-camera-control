@@ -16,7 +16,7 @@ function init(server) {
 
   controllerIo.on('connection', function (socket) {
     console.log("Controller connected...");
-    controller = socket;
+    //controller = socket;
 
     socket.on('activate', function(message) {
       console.log("Got activate event");
@@ -46,7 +46,7 @@ function init(server) {
     })
 
     console.log("Send camera list...");
-    if (controller) controller.emit('list', Cameras.list())
+    socket.emit('list', Cameras.list())
   })
 
   cameraIo.on('connection', function (socket) {
@@ -59,7 +59,7 @@ function init(server) {
       var camera = Cameras.findBySocket(socket);
       if (camera) {
         camera.setStatus('offline');
-        if (controller) controller.emit('status', {id: camera.id, status: camera.status})
+        controllerIo.emit('status', {id: camera.id, status: camera.status})
       }
       else {
         console.log("Unable to find camera in collection");
@@ -73,7 +73,7 @@ function init(server) {
       console.log('Got ' + alarm.type + ' alarm at ' + alarm.timestamp + '. Send to front end.');
       var camera = Cameras.findBySocket(socket);
       camera.addAlarm({type: alarm.type, timestamp: alarm.timestamp})
-      if (controller) controller.emit('alarm', {id: camera.id, type: alarm.type, timestamp: alarm.timestamp});
+      controllerIo.emit('alarm', {id: camera.id, type: alarm.type, timestamp: alarm.timestamp});
     }
   };
 
@@ -85,7 +85,7 @@ function init(server) {
       stream.on('finish', function () {
         var camera = Cameras.findBySocket(socket);
         console.log("URL = " + url);
-        if (controller) controller.emit('image', {id: camera.id, src: url});
+        controllerIo.emit('image', {id: camera.id, src: url});
       });
       stream.pipe(fs.createWriteStream(publicDir + url, {mode: "0666"}));
     }
@@ -96,7 +96,7 @@ function init(server) {
       var camera = Cameras.findBySocket(socket);
       camera.status = message.status;
       console.log("Got status update: status = " + message.status + " for camera: " + camera.name);
-      if (controller) controller.emit('status', {id: camera.id, status: camera.status})
+      controllerIo.emit('status', {id: camera.id, status: camera.status})
     }
   };
 
@@ -106,7 +106,7 @@ function init(server) {
       console.log(camera);
       Cameras.add({name: camera.name, id: camera.id, socket: socket});
       console.log("Sending list event");
-      if (controller) controller.emit('list', Cameras.list())
+      controllerIo.emit('list', Cameras.list())
     }
   }
 }
