@@ -6,7 +6,7 @@ var path = require('path');
 var moment = require('moment');
 
 var fs = require('fs');
-var publicDir = "public";
+var publicDir = "../public";
 var imageDir= "images";
 
 function init(server) {
