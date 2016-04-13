@@ -96,6 +96,7 @@ function setMjpeg (cameraId, alarmId, src) {
     var $alarmImg = $(id).find('img')
     $alarmImg.attr('src', src);
 }
+
 function setStatus(cameraId, status) {
     cameraList[cameraId].status = status;
     updateCameraRow(cameraId);
@@ -126,6 +127,6 @@ controller
         listCameras(cameras);
     })
     .on('mjpeg', function (url) {
-        setMjpeg(url.id, url.alarmId, url.src);
+        setThumbnail(url.id, url.alarmId, url.src);
         console.log("Got MJPEG URL " + url);
     })
