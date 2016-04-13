@@ -123,6 +123,9 @@ function init(server) {
         console.log("URL = " + url);
         controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
       });
+      stream.on('error', function () {
+        console.log("Steam error - " + fullPath)
+      });
       console.log("Creating frame write stream.");
       stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
 
