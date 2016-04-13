@@ -84,7 +84,7 @@ function setAlarm(cameraId, alarm) {
     var $alarmItem = $('<div>', {id: "alarm-" + cameraId + "-" + alarm.timestamp, class: 'row alarm'});
     var $alarmText = $('<div>', {class: 'col-xs-8 timestamp',  text: alarm.type + " at " + alarm.timestamp})
     var $alarmImgCol = $('<div>', {class: 'col-xs-4'});
-    var $alarmImgLink = $('<a>', {class: 'mjpeg-link', href: alarm.src});
+    var $alarmImgLink = $('<a>', {class: 'mjpeg-link'});
     var $alarmImg = $("<img>", {class: "alarm-image thumbnail"});
     $alarmImgLink.append($alarmImg);
     $alarmItem.append($alarmText);
@@ -93,9 +93,9 @@ function setAlarm(cameraId, alarm) {
     $alarms.prepend($alarmItem);
 }
 
-function setMjpeg (cameraId, alarmId, src) {
+function setMjpeg (cameraId, alarmId, url) {
     var id = 'alarm-' + cameraId + "-" + alarmId;
-    $(id).find(".mjpeg-link").attr("src",src)
+    $(id).find(".mjpeg-link").attr("href",url)
 }
 
 function setStatus(cameraId, status) {
