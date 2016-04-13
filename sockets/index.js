@@ -55,7 +55,8 @@ function init(server) {
     console.log('Camera connected...');
     socket.on('register', registerCamera(socket));
     socket.on('status', updateStatus(socket));
-    ioStream(socket).on('image', sendImage(socket));
+    ioStream(socket).on('thumbnail', sendImage(socket));
+    ioStream(socket).on('frame', readFrame(socket));
     socket.on('alarm', sendAlarm(socket));
     socket.on('disconnect', function () {
       var camera = Cameras.findBySocket(socket);
@@ -69,6 +70,12 @@ function init(server) {
       console.log("Camera disconnected...");
     });
   });
+
+  function readFrame(socket) {
+    return function (stream, data, cb) {
+      console.log("Got frame: " + data.timestamp + "," + data.name);
+    }
+  }
 
   function sendAlarm(socket) {
     return function (alarm) {
@@ -93,7 +100,7 @@ function init(server) {
       stream.on('finish', function () {
         var camera = Cameras.findBySocket(socket);
         console.log("URL = " + url);
-        controllerIo.emit('image', {id: camera.id, alarmId: data.timestamp, src: url});
+        controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
       });
       stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
 

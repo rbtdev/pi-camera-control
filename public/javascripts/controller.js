@@ -76,7 +76,7 @@ function setThumbnail(cameraId, alarmId, src) {
     $(id).find(".alarm-image").error(function (e) {
         console.log('image error');
     }).attr("src",src)
-};
+}
 
 function setAlarm(cameraId, alarm) {
     var id = "#camera-"+cameraId;
@@ -111,7 +111,7 @@ controller
         console.log("Got alarm signal for camera " + alarm.id + " - " + alarm.type);
         setAlarm(alarm.id, alarm);
     })
-    .on('image', function (image) {
+    .on('thumbnail', function (image) {
         console.log("Got image from camera " + image.id);
         // set thumbnail to image
         setThumbnail(image.id, image.alarmId, image.src);
