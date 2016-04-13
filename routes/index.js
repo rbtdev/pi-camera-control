@@ -11,8 +11,55 @@ router.get('/mjpeg/:timestamp', function (req, res, next) {
 	var timestamp = req.params.timestamp;
 	console.log("***** GOT MJPEG request for id " +   timestamp);
 
+	// read files from public/images/capture/<timestamp>/mpjpeg
 
+	var dirPath = "public/images/capture/" + timestamp + "/mjpeg/";
+	fs.readdir(dirPath, function (err, files) {
+		if (err) {
+		throw err;
+		}
+		else {
+			res.writeHead(200, {
+				'Content-Type': 'multipart/x-mixed-replace; boundary=myboundary',
+				'Cache-Control': 'no-cache',
+				'Connection': 'close',
+				'Pragma': 'no-cache'
+			});
+			var stop = false;
+			res.connection.on('close', function() { stop = true; });
+			var i = 0;
+			sendNext();
 
+			function sendNext () {
+					console.log("count = " + i);
+					var filename = files[i];
+					console.log("Reading " + filename);
+					fs.readFile(dirPath + filename, function (err, content) {
+						if (err) {
+							console.log ("Error-" + err) 
+						}
+						else {
+							if (content) {
+								res.write("--myboundary\r\n");
+								res.write("Content-Type: image/jpeg\r\n");
+								res.write("Content-Length: " + content.length + "\r\n");
+								res.write("\r\n");
+								res.write(content, 'binary');
+								res.write("\r\n");
+							}
+							else {
+								console.log("no content");
+							}
+						}
+						i = (i+1) % files.length;
+						console.log(i);
+						if (!stop) {
+							setTimeout(sendNext, 250);
+						}
+					});
+			}
+		}
+    });
 })
 
 module.exports = router;
