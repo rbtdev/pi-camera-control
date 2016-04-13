@@ -120,3 +120,6 @@ controller
         cameraList = cameras;
         listCameras(cameras);
     })
+    .on('mjpeg', function (url) {
+        console.log("Got MJPEG URL " + url);
+    })
