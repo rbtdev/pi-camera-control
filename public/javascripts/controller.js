@@ -126,6 +126,6 @@ controller
         listCameras(cameras);
     })
     .on('mjpeg', function (url) {
-        setMpjpeg(url.id, url.alarm, url.src);
+        setMjpeg(url.id, url.alarmId, url.src);
         console.log("Got MJPEG URL " + url);
     })
