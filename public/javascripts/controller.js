@@ -84,17 +84,18 @@ function setAlarm(cameraId, alarm) {
     var $alarmItem = $('<div>', {id: "alarm-" + cameraId + "-" + alarm.timestamp, class: 'row alarm'});
     var $alarmText = $('<div>', {class: 'col-xs-8 timestamp',  text: alarm.type + " at " + alarm.timestamp})
     var $alarmImgCol = $('<div>', {class: 'col-xs-4'});
+    var $alarmImgLink = $('<a>', {class: 'mjpeg-link', href: alarm.src});
     var $alarmImg = $("<img>", {class: "alarm-image thumbnail"});
+    $alarmImgLink.append($alarmImg);
     $alarmItem.append($alarmText);
     $alarmItem.append($alarmImgCol);
-    $alarmImgCol.append($alarmImg);
+    $alarmImgCol.append($alarmImgLink);
     $alarms.prepend($alarmItem);
 }
 
 function setMjpeg (cameraId, alarmId, src) {
     var id = 'alarm-' + cameraId + "-" + alarmId;
-    var $alarmImg = $(id).find('img')
-    $alarmImg.attr('src', src);
+    $(id).find(".mjpeg-link").attr("src",src)
 }
 
 function setStatus(cameraId, status) {
@@ -127,6 +128,6 @@ controller
         listCameras(cameras);
     })
     .on('mjpeg', function (url) {
-        setThumbnail(url.id, url.alarmId, url.src);
+        setMjpeg(url.id, url.alarmId, url.src);
         console.log("Got MJPEG URL " + url);
     })
