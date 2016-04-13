@@ -90,6 +90,7 @@ function init(server) {
       stream.on('finish', function () {
         console.log("JPEG Frame saved to " + fullPath);
       });
+      console.log("Opening write stram to " + fullPath);
       stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
     }
   }
