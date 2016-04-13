@@ -112,7 +112,9 @@ function init(server) {
       var url = "/" + imageDir + "/capture/" + data.timestamp + "/" + "thumb_" + filename;
       var fullPath =  publicDir + url;
       try {
+        console.log("creating timestamp dir");
         fs.mkdirSync(localDir);
+        console.log("creating mjpeg dir");
         fs.mkdirSync(localDir + "/mjpeg");
       } catch (e) {
       }
@@ -121,6 +123,7 @@ function init(server) {
         console.log("URL = " + url);
         controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
       });
+      console.log("Creating frame write stream.");
       stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
 
     }
