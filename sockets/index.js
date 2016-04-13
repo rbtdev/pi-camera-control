@@ -57,6 +57,7 @@ function init(server) {
     socket.on('status', updateStatus(socket));
     ioStream(socket).on('thumbnail', sendImage(socket));
     ioStream(socket).on('frame', readFrame(socket));
+    socket.on('mjpeg', sendMjpeg(socket));
     socket.on('alarm', sendAlarm(socket));
     socket.on('disconnect', function () {
       var camera = Cameras.findBySocket(socket);
@@ -71,9 +72,25 @@ function init(server) {
     });
   });
 
+  function sendMjpeg(socket) {
+    return function (timestamp) {
+      var camera = Cameras.findBySocket(socket);
+      var url = "/mjpeg/" + timestamp;
+      controllerIo.emit('mjpeg', {id: camera.id, alarmId: timestamp, src: url});
+    }
+  }
+
   function readFrame(socket) {
     return function (stream, data, cb) {
       console.log("Got frame: " + data.timestamp + "," + data.name);
+      // save frame in timestamp mjpeg dir
+      var filename = path.basename(data.name);
+      var localDir =  publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/mjpeg/";
+      var fullPath = localDir + filename;
+      stream.on('finish', function () {
+        console.log("JPEG Frame saved to " + fullPath);
+      });
+      stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
     }
   }
 
@@ -95,6 +112,7 @@ function init(server) {
       var fullPath =  publicDir + url;
       try {
         fs.mkdirSync(localDir);
+        fs.mkdirSync(localDir + "/mjpeg");
       } catch (e) {
       }
       stream.on('finish', function () {
