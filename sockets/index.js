@@ -91,7 +91,7 @@ function init(server) {
       console.log("Got image upload event. Saving image.");
       var filename = path.basename(data.name);
       var localDir =  publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/";
-      var url = "/" + imageDir + "/capture/" + data.timestamp + "/" + filename;
+      var url = "/" + imageDir + "/capture/" + data.timestamp + "/" + "thumb_" + filename;
       var fullPath =  publicDir + url;
       try {
         fs.mkdirSync(localDir);
