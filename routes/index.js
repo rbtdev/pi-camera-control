@@ -8,7 +8,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/mjpeg/:timestamp', function (req, res, next) {
-	var timestamp = request.params.timestamp;
+	var timestamp = req.params.timestamp;
 	console.log("***** GOT MJPEG request for id " +   timestamp);
 
 
