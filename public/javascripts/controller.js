@@ -17,20 +17,16 @@ function listCameras(cameras) {
 function createCameraRow(cameraId) {
     var $cameraRow = $("<div>", {id:"camera-" + cameraId, class: "row"});
     var $statusRow = $('<div>', {class: 'row'});
-    var $cameraName = $("<div>", {class: "col-xs-3 name"});
-    var $buttonCol = $("<div>", {class: "col-xs-3 col-sm-2 col-md-1 col-lg-1"});
-    var $imgCol = $("<div>", {class: "col-xs-1 image"});
-    var $img = $("<img>", {class: "thumbnail"});
+    var $cameraName = $("<div>", {class: "col-xs-8 name"});
+    var $buttonCol = $("<div>", {class: "col-xs-4 col-sm-2 col-md-1 col-lg-1"});
     var $alarmsRow = $('<div>', {class: 'row'});
-    var $alarms = $('<ul>', {class: 'alarms'});
+    var $alarms = $('<div>', {class: 'col-xs-12 alarms'});
     var $cameraButton = $("<button>", {type: "button", class: "status"})
     $cameraButton.click(toggleStatus);
-    $imgCol.append($img);
     $buttonCol.append($cameraButton);
     $alarmsRow.append($alarms);
     $statusRow.append($cameraName);
     $statusRow.append($buttonCol);
-    $statusRow.append($imgCol);
     $cameraRow.append($statusRow);
     $cameraRow.append($alarmsRow);
 
@@ -73,11 +69,11 @@ function toggleStatus() {
     var event = (cameraList[cameraId].status=='active')?'deactivate':'activate';
     controller.emit(event, {id: cameraId});
     return false
-}
+};
 
-function setThumbnail(cameraId, src) {
-    var id = "#camera-"+cameraId;
-    $(id).find(".thumbnail").error(function (e) {
+function setThumbnail(cameraId, alarmId, src) {
+    var id = "#alarm-" + cameraId + "-" + alarmId;
+    $(id).find(".alarm-image").error(function (e) {
         console.log('image error');
     }).attr("src",src)
 };
@@ -85,8 +81,14 @@ function setThumbnail(cameraId, src) {
 function setAlarm(cameraId, alarm) {
     var id = "#camera-"+cameraId;
     var $alarms = $(id).find('.alarms');
-    var $alarm = $('<li>', {class: 'alarm', text: alarm.type + " at " + alarm.timestamp});
-    $alarms.prepend($alarm);
+    var $alarmItem = $('<div>', {id: "alarm-" + cameraId + "-" + alarm.timestamp, class: 'row alarm'});
+    var $alarmText = $('<div>', {class: 'col-xs-8 timestamp',  text: alarm.type + " at " + alarm.timestamp})
+    var $alarmImgCol = $('<div>', {class: 'col-xs-4'});
+    var $alarmImg = $("<img>", {class: "alarm-image thumbnail"});
+    $alarmItem.append($alarmText);
+    $alarmItem.append($alarmImgCol);
+    $alarmImgCol.append($alarmImg);
+    $alarms.prepend($alarmItem);
 }
 
 function setStatus(cameraId, status) {
@@ -112,7 +114,7 @@ controller
     .on('image', function (image) {
         console.log("Got image from camera " + image.id);
         // set thumbnail to image
-        setThumbnail(image.id, image.src);
+        setThumbnail(image.id, image.alarmId, image.src);
     })
     .on('list', function (cameras) {
         cameraList = cameras;

@@ -3,6 +3,8 @@ var socketIo = require('socket.io');
 var ioStream = require('socket.io-stream');
 var Cameras = require('./cameras.js');
 var path = require('path');
+var moment = require('moment');
+
 var fs = require('fs');
 var publicDir = "public";
 var imageDir= "images";
@@ -81,13 +83,20 @@ function init(server) {
     return function(stream, data, cb) {
       console.log("Got image upload event. Saving image.");
       var filename = path.basename(data.name);
-      var url = "/" + imageDir + "/" + filename;
+      var localDir =  publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/";
+      var url = "/" + imageDir + "/capture/" + data.timestamp + "/" + filename;
+      var fullPath =  publicDir + url;
+      try {
+        fs.mkdirSync(localDir);
+      } catch (e) {
+      }
       stream.on('finish', function () {
         var camera = Cameras.findBySocket(socket);
         console.log("URL = " + url);
-        controllerIo.emit('image', {id: camera.id, src: url});
+        controllerIo.emit('image', {id: camera.id, alarmId: data.timestamp, src: url});
       });
-      stream.pipe(fs.createWriteStream(publicDir + url, {mode: "0666"}));
+      stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
+
     }
   };
 
