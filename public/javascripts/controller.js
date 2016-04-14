@@ -99,6 +99,7 @@ function setMjpeg (cameraId, alarmId, url) {
     var id = '#alarm-' + cameraId + "-" + alarmId;
     var link = $(id).find(".mjpeg-link");
     link.attr("href",url);
+    link.attr("target", "_blank");
 }
 
 function setStatus(cameraId, status) {
