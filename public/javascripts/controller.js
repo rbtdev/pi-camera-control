@@ -71,12 +71,7 @@ function toggleStatus() {
     return false
 };
 
-function setThumbnail(cameraId, alarmId, src) {
-    var id = "#alarm-" + cameraId + "-" + alarmId;
-    $(id).find(".alarm-image").error(function (e) {
-        console.log('image error');
-    }).attr("src",src)
-}
+
 
 function setAlarm(cameraId, alarm) {
     var id = "#camera-"+cameraId;
@@ -93,9 +88,17 @@ function setAlarm(cameraId, alarm) {
     $alarms.prepend($alarmItem);
 }
 
+function setThumbnail(cameraId, alarmId, src) {
+    var id = "#alarm-" + cameraId + "-" + alarmId;
+    $(id).find(".alarm-image").error(function (e) {
+        console.log('image error');
+    }).attr("src",src)
+}
+
 function setMjpeg (cameraId, alarmId, url) {
-    var id = 'alarm-' + cameraId + "-" + alarmId;
-    $(id).find(".mjpeg-link").attr("href",url)
+    var id = '#alarm-' + cameraId + "-" + alarmId;
+    var link = $(id).find(".mjpeg-link");
+    link.attr("href",url);
 }
 
 function setStatus(cameraId, status) {
