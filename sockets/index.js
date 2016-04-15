@@ -107,6 +107,13 @@ function init(server) {
 
   function dropboxUpload(filePath, cb) {
     console.log("Upload to dropbox stub");
+    fs.readFile(filePath, function (err, contents) {
+      if (err) console.log("Dropbox upload error - " + err);
+      dropbox.createFile(path, contents, function (error, response, body) {
+        if (err) console.log("db error " + error);
+        console.log("Dropbox upload completed for " + filePath)
+      });
+    });
   }
 
   function sendImage (socket) {
