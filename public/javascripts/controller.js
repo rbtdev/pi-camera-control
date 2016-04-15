@@ -64,6 +64,7 @@ function updateCameraRow(cameraId) {
     $statusBtn.text(btnText);
     $statusBtn.attr('data-camera-id', camera.id);
     $statusBtn.attr('class', btnClass);
+    $(id).find('.alarms').remove();
     for (var i=camera.alarms.length-1; i>=0; i--) {
         setAlarm(camera.id, camera.alarms[i]);
     }
@@ -115,7 +116,6 @@ function setMjpeg (cameraId, alarmId, url) {
 
 function setStatus(cameraId, status) {
     cameraList[cameraId].status = status;
-    createCameraRow(cameraId);
     updateCameraRow(cameraId);
 }
 
