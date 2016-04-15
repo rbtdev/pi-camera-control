@@ -24,7 +24,7 @@ Camera.prototype.setStatus = function (status) {
 
 Camera.prototype.addAlarm = function (alarm) {
   console.log("Creating alarm: " + JSON.stringify(alarm));
-  this.alarms.push(alarm);
+  this.alarms.unshift(alarm);
 }
 
 Camera.prototype.setThumbnailUrl = function (alarmId, url) {
