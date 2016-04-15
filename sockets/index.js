@@ -105,11 +105,12 @@ function init(server) {
     }
   };
 
-  function dropboxUpload(filePath, cb) {
+  function dropboxUpload(filePath, dbPath, cb) {
     console.log("Upload to dropbox stub");
     fs.readFile(filePath, function (err, contents) {
       if (err) console.log("Dropbox upload error - " + err);
-      dropbox.createFile(path, contents, function (error, response, body) {
+
+      dropbox.createFile(dbPath, contents, function (error, response, body) {
         if (err) console.log("db error " + error);
         console.log("Dropbox upload completed for " + filePath)
       });
@@ -135,7 +136,8 @@ function init(server) {
         dropbox.createDir(data.timestamp + "/mjpeg", function () {
           if (err) return console.log("Error creating dropbox mjpeg dir")
           stream.on('finish', function () {
-            dropboxUpload(fullPath, function (err, resp, body) {
+            var dbPath = data.timestamp + "/" + filename;
+            dropboxUpload(fullPath, dbPath, function (err, resp, body) {
                 console.log("DB Resp =" + resp);
                 console.log("DB Body =" + body);
                 var url = '';
