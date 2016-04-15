@@ -145,7 +145,13 @@ function init(server) {
     return function (camera) {
       console.log("Got register event.");
       console.log(camera);
-      Cameras.add({name: camera.name, id: camera.id, socket: socket});
+      var camera = Cameras[camera.id];
+      if (camera) {
+        camera.socket = socket;
+      }
+      else {
+        Cameras.add({name: camera.name, id: camera.id, socket: socket});
+      }
       console.log("Sending list event");
       controllerIo.emit('list', Cameras.list())
     }
