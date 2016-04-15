@@ -4,6 +4,7 @@ var ioStream = require('socket.io-stream');
 var Cameras = require('./cameras.js');
 var path = require('path');
 var moment = require('moment');
+var dropbox = require('node-dropbox').api(process.env.DROPBOX_ACCESS_TOKEN);
 
 var fs = require('fs');
 var publicDir = "public";
@@ -104,30 +105,42 @@ function init(server) {
     }
   };
 
+  function dropboxUpload(filePath, cb) {
+    dropbox.
+  }
   function sendImage (socket) {
     return function(stream, data, cb) {
       console.log("Got image upload event. Saving image.");
-      var filename = path.basename(data.name);
+      var filename = "thumb_" + path.basename(data.name);
       var localDir =  publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/";
-      var url = "/" + imageDir + "/capture/" + data.timestamp + "/" + "thumb_" + filename;
+      var url = "/" + imageDir + "/capture/" + data.timestamp + "/" + filename;
       var fullPath =  publicDir + url;
       try {
-        console.log("creating timestamp dir");
         fs.mkdirSync(localDir);
-        console.log("creating mjpeg dir");
         fs.mkdirSync(localDir + "/mjpeg");
       } catch (e) {
+        return console.log("Error creating directories.");
       }
-      stream.on('finish', function () {
-        var camera = Cameras.findBySocket(socket);
-        console.log("URL = " + url);
-        controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
+      dropbox.createDir(data.timestamp, function (err, path) {
+        if (err) return console.log("Error creating dropbox alarm dir");
+        console.log("Dropbox Created " + path)
+        dropbox.createDir(data.timestamp + "/mjpeg", function () {
+          if (err) return console.log("Error creating dropbox mjpeg dir")
+          stream.on('finish', function () {
+            dropboxUpload(fullPath, function (err, resp, body) {
+                console.log("DB Resp =" + resp);
+                console.log("DB Body =" + body);
+                var url = '';
+                controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
+            })
+          });
+          stream.on('error', function () {
+            return console.log("Steam error - " + fullPath)
+          });
+          console.log("Creating frame write stream.");
+          stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
+        }
       });
-      stream.on('error', function () {
-        console.log("Steam error - " + fullPath)
-      });
-      console.log("Creating frame write stream.");
-      stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
 
     }
   };
