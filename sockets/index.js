@@ -135,7 +135,7 @@ function init(server) {
     return function (camera) {
       console.log("Got register event.");
       console.log(camera);
-      var existingCamera = Cameras.findByid(camera.id);
+      var existingCamera = Cameras.findById(camera.id);
       console.log("List of cameras = " + JSON.stringify(Cameras.list()));
       console.log("Camera id " + camera.id);
       if (existingCamera) {
