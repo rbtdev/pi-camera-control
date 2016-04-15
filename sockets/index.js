@@ -145,9 +145,9 @@ function init(server) {
     return function (camera) {
       console.log("Got register event.");
       console.log(camera);
-      var camera = Cameras[camera.id];
-      if (camera) {
-        camera.socket = socket;
+      var existingCamera = Cameras[camera.id];
+      if (existingCamera) {
+        existingCamera.socket = socket;
       }
       else {
         Cameras.add({name: camera.name, id: camera.id, socket: socket});
