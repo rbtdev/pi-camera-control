@@ -31,32 +31,26 @@ router.get('/mjpeg/:timestamp', function (req, res, next) {
 			sendNext();
 
 			function sendNext () {
-					console.log("count = " + i);
-					var filename = files[i];
-					console.log("Reading " + filename);
-					fs.readFile(dirPath + filename, function (err, content) {
-						if (err) {
-							console.log ("Error-" + err) 
-						}
-						else {
-							if (content) {
-								res.write("--myboundary\r\n");
-								res.write("Content-Type: image/jpeg\r\n");
-								res.write("Content-Length: " + content.length + "\r\n");
-								res.write("\r\n");
-								res.write(content, 'binary');
-								res.write("\r\n");
-							}
-							else {
-								console.log("no content");
-							}
-						}
-						i = (i+1) % files.length;
-						console.log(i);
-						if (!stop) {
-							setTimeout(sendNext, 250);
-						}
-					});
+				console.log("count = " + i);
+				var filename = files[i];
+				console.log("Reading " + filename);
+				var content = fs.readFileSync(dirPath + filename);
+				if (content) {
+					res.write("--myboundary\r\n");
+					res.write("Content-Type: image/jpeg\r\n");
+					res.write("Content-Length: " + content.length + "\r\n");
+					res.write("\r\n");
+					res.write(content, 'binary');
+					res.write("\r\n");
+				}
+				else {
+					console.log("no content");
+				}
+				i = (i+1) % files.length;
+				console.log(i);
+				if (!stop) {
+					setTimeout(sendNext, 250);
+				};	
 			}
 		}
     });
