@@ -60,17 +60,7 @@ function init(server) {
     ioStream(socket).on('frame', readFrame(socket));
     socket.on('mjpeg', sendMjpeg(socket));
     socket.on('alarm', sendAlarm(socket));
-    socket.on('disconnect', function () {
-      var camera = Cameras.findBySocket(socket);
-      if (camera) {
-        camera.setStatus('offline');
-        controllerIo.emit('status', {id: camera.id, status: camera.status})
-      }
-      else {
-        console.log("Unable to find camera in collection");
-      }
-      console.log("Camera disconnected...");
-    });
+    socket.on('disconnect', disconnectCamera(socket));
   });
 
   function sendMjpeg(socket) {
@@ -147,6 +137,7 @@ function init(server) {
       console.log(camera);
       var existingCamera = Cameras[camera.id];
       if (existingCamera) {
+        console.log("Found camera in camera list " + camera.id);
         existingCamera.socket = socket;
       }
       else {
@@ -156,6 +147,18 @@ function init(server) {
       controllerIo.emit('list', Cameras.list())
     }
   }
+
+  function disconnectCamera (socket) {
+    var camera = Cameras.findBySocket(socket);
+    if (camera) {
+      camera.setStatus('offline');
+      controllerIo.emit('status', {id: camera.id, status: camera.status})
+    }
+    else {
+      console.log("Unable to find camera in collection");
+    }
+    console.log("Camera disconnected...");
+  };
 
   function createThumbnailUrl(alarmId, filename) {
     var url = "/" + imageDir + "/capture/" + alarmId + "/" + filename;
