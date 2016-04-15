@@ -21,7 +21,7 @@ function createCameraRow(cameraId) {
     var $buttonCol = $("<div>", {class: "col-xs-4 col-sm-2 col-md-1 col-lg-1"});
     var $alarmsRow = $('<div>', {class: 'row'});
     var $alarms = $('<div>', {class: 'col-xs-12 alarms'});
-    var $cameraButton = $("<button>", {type: "button", class: "status"})
+    var $cameraButton = $("<button>", {type: "button", class: "status", 'data-camera-id': cameraId})
     $cameraButton.click(toggleStatus);
     $buttonCol.append($cameraButton);
     $alarmsRow.append($alarms);
@@ -37,33 +37,10 @@ function createCameraRow(cameraId) {
 
 function updateCameraRow(cameraId) {
     var camera = cameraList[cameraId];
-    var buttonStatus = {
-        'offline': {
-            class: 'btn-warning',
-            text: 'Off Line'
-        },
-
-        'active': {
-            class: 'btn-success',
-            text: 'ON'
-        },
-
-        'disabled': {
-            class: 'btn-danger',
-            text: "OFF"
-        }
-    }
-
-    var btnStatus = buttonStatus[camera.status].class;
-    var btnClass = "btn btn-block " + btnStatus + " status";
-    var btnText = buttonStatus[camera.status].text;
     var id = '#camera-' + camera.id;
     var $cameraRow = $(id);
     $cameraRow.find('.name').text(camera.name);
-    var $statusBtn = $cameraRow.find('.status');
-    $statusBtn.text(btnText);
-    $statusBtn.attr('data-camera-id', camera.id);
-    $statusBtn.attr('class', btnClass);
+    setStatus(camera.id, camera.status);
     $(id).find('.alarms').empty();
     for (var i=camera.alarms.length-1; i>=0; i--) {
         setAlarm(camera.id, camera.alarms[i]);
@@ -115,8 +92,30 @@ function setMjpeg (cameraId, alarmId, url) {
 }
 
 function setStatus(cameraId, status) {
+    var id = "#camera-"+cameraId;
     cameraList[cameraId].status = status;
-    updateCameraRow(cameraId);
+    var buttonClasses = {
+        'offline': {
+            class: 'btn-warning',
+            text: 'Off Line'
+        },
+
+        'active': {
+            class: 'btn-success',
+            text: 'ON'
+        },
+
+        'disabled': {
+            class: 'btn-danger',
+            text: "OFF"
+        }
+    }
+    var btnStatus = buttonClasses[status].class;
+    var btnClass = "btn btn-block " + btnStatus + " status";
+    var btnText = buttonClasses[status].text;
+    var $statusBtn = $(id).find('.status');
+    $statusBtn.text(btnText);
+    $statusBtn.attr('class', btnClass);
 }
 
 /**
