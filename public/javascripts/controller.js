@@ -115,6 +115,7 @@ function setMjpeg (cameraId, alarmId, url) {
 
 function setStatus(cameraId, status) {
     cameraList[cameraId].status = status;
+    createCameraRow(cameraId);
     updateCameraRow(cameraId);
 }
 
