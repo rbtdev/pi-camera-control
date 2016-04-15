@@ -118,7 +118,8 @@ function init(server) {
         return console.log("Error creating directories.");
       }
       stream.on('finish', function () {
-            controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
+          var camera = Cameras.findBySocket(socket);
+          controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
       });
       stream.on('error', function () {
         return console.log("Steam error - " + fullPath)
