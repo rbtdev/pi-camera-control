@@ -14,12 +14,11 @@ function init(server) {
   var controllerIo = io.of('/controller');
   var cameraIo = io.of('/camera');  
 
-  var controller = null;
+  var controllerCount = 0;
 
   controllerIo.on('connection', function (socket) {
     console.log("Controller connected...");
-    //controller = socket;
-
+    controllerCount++;
     socket.on('activate', function(message) {
       console.log("Got activate event");
       var camera = Cameras.findById(message.id);
@@ -44,10 +43,12 @@ function init(server) {
         }
     });
     socket.on('disconnect', function () {
-
+      controllerCount--;
+      console.log("Connected controllers = " + controllerCount);
     })
 
     console.log("Send camera list...");
+    console.log(Cameras.list());
     socket.emit('list', Cameras.list())
   })
 
@@ -76,6 +77,7 @@ function init(server) {
     return function (timestamp) {
       var camera = Cameras.findBySocket(socket);
       var url = "/mjpeg/" + timestamp;
+      camera.setMjpegUrl(timestamp, url);
       controllerIo.emit('mjpeg', {id: camera.id, alarmId: timestamp, src: url});
     }
   }
@@ -107,9 +109,11 @@ function init(server) {
   function sendImage (socket) {
     return function(stream, data, cb) {
       console.log("Got image upload event. Saving image.");
+      var camera = Cameras.findBySocket(socket);
       var filename = "thumb_" + path.basename(data.name);
       var localDir =  publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/";
-      var url = "/" + imageDir + "/capture/" + data.timestamp + "/" + filename;
+      var url = createThumbnailUrl(data.timestamp, filename);
+      camera.setThumbnailUrl(data.timestamp, url);
       var fullPath =  publicDir + url;
       try {
         fs.mkdirSync(localDir);
@@ -118,7 +122,6 @@ function init(server) {
         return console.log("Error creating directories.");
       }
       stream.on('finish', function () {
-          var camera = Cameras.findBySocket(socket);
           controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
       });
       stream.on('error', function () {
@@ -146,6 +149,11 @@ function init(server) {
       console.log("Sending list event");
       controllerIo.emit('list', Cameras.list())
     }
+  }
+
+  function createThumbnailUrl(alarmId, filename) {
+    var url = "/" + imageDir + "/capture/" + alarmId + "/" + filename;
+    return url;
   }
 }
 

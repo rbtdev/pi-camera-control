@@ -23,7 +23,39 @@ Camera.prototype.setStatus = function (status) {
 };
 
 Camera.prototype.addAlarm = function (alarm) {
+  console.log("Creating alarm: " + JSON.stringify(alarm));
   this.alarms.push(alarm);
+}
+
+Camera.prototype.setThumbnailUrl = function (alarmId, url) {
+  console.log("Setting thumbnail: alarmId = " + alarmId + " url = " + url);
+  var alarm = this.findAlarmById(alarmId);
+  if (alarm) {
+    alarm.thumbUrl = url;
+  }
+}
+
+Camera.prototype.setMjpegUrl = function (alarmId, url) {
+  var alarm = this.findAlarmById(alarmId);
+  if (alarm) {
+    alarm.mjpegUrl = url;
+  }
+}
+
+Camera.prototype.findAlarmById = function (alarmId) {
+  console.log("Finding alarm with timestamp = " + alarmId);
+  console.log("Alarm list = " + JSON.stringify(this.alarms));
+  console.log("Alarms Length = " + this.alarms.length);
+  for (var i = 0; i<this.alarms.length; i++) {
+    console.log("index = " + i);
+    var alarm = this.alarms[i];
+    console.log("Alarm = " + JSON.stringify(alarm))
+    console.log("Timestamp = " + alarm.timestamp);
+    if (this.alarms[i].timestamp === alarmId) {
+      console.log("Found alarm");
+      return this.alarms[i];
+    }
+  }
 }
 
 
@@ -57,7 +89,7 @@ var Cameras = {
 
   list: function () {
     var list = {};
-    for (cameraId in _cameras) {
+    for (var cameraId in _cameras) {
       var camera = _cameras[cameraId];
       list[cameraId] = camera.export();
     }

@@ -91,6 +91,12 @@ function setAlarm(cameraId, alarm) {
     $alarmItem.append($alarmImgCol);
     $alarmImgCol.append($alarmImgLink);
     $alarms.prepend($alarmItem);
+    if (alarm.thumbUrl) {
+        setThumbnail(cameraId, alarm.timestamp, alarm.thumbUrl);
+    }
+    if (alarm.mjpegUrl) {
+        setMjpeg(cameraId, alarm.timestamp, alarm.mjpegUrl);
+    }
 }
 
 function setThumbnail(cameraId, alarmId, src) {
