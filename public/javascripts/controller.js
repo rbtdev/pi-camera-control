@@ -33,6 +33,8 @@ function createCameraRow(cameraId) {
     return $cameraRow;
 };
 
+
+
 function updateCameraRow(cameraId) {
     var camera = cameraList[cameraId];
     var buttonStatus = {
@@ -62,6 +64,9 @@ function updateCameraRow(cameraId) {
     $statusBtn.text(btnText);
     $statusBtn.attr('data-camera-id', camera.id);
     $statusBtn.attr('class', btnClass);
+    for (var i=camera.alarms.length-1; i>=0; i--) {
+        setAlarm(camera.id, camera.alarms[i]);
+    }
 }
 
 function toggleStatus() {

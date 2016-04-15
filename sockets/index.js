@@ -106,8 +106,9 @@ function init(server) {
   };
 
   function dropboxUpload(filePath, cb) {
-    dropbox.
+    console.log("Upload to dropbox stub");
   }
+
   function sendImage (socket) {
     return function(stream, data, cb) {
       console.log("Got image upload event. Saving image.");
@@ -139,7 +140,7 @@ function init(server) {
           });
           console.log("Creating frame write stream.");
           stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
-        }
+        });
       });
 
     }

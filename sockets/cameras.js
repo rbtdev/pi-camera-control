@@ -10,7 +10,12 @@ function Camera (camera) {
 };
 
 Camera.prototype.export = function () {
-  return {name: this.name, id: this.id, status: this.status, alarms: this.alarms}
+  return {
+      name: this.name, 
+      id: this.id, 
+      status: this.status, 
+      alarms: this.alarms
+    }
 };
 
 Camera.prototype.setStatus = function (status) {
