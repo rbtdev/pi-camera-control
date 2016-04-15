@@ -136,9 +136,9 @@ function init(server) {
       console.log("Got register event.");
       console.log(camera);
       var existingCamera = Cameras[camera.id];
-      console.log("Existing camera id = " + existingCamera.id);
       console.log("List of cameras = " + Cameras.list());
       if (existingCamera) {
+        console.log("Existing camera id = " + existingCamera.id);
         console.log("Found camera in camera list " + camera.id);
         existingCamera.socket = socket;
       }
