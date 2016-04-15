@@ -149,15 +149,17 @@ function init(server) {
   }
 
   function disconnectCamera (socket) {
-    var camera = Cameras.findBySocket(socket);
-    if (camera) {
-      camera.setStatus('offline');
-      controllerIo.emit('status', {id: camera.id, status: camera.status})
+    return function () {
+      var camera = Cameras.findBySocket(socket);
+      if (camera) {
+        camera.setStatus('offline');
+        controllerIo.emit('status', {id: camera.id, status: camera.status})
+      }
+      else {
+        console.log("Unable to find camera in collection");
+      }
+      console.log("Camera disconnected...");
     }
-    else {
-      console.log("Unable to find camera in collection");
-    }
-    console.log("Camera disconnected...");
   };
 
   function createThumbnailUrl(alarmId, filename) {
