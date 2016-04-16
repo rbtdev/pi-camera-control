@@ -9,16 +9,15 @@ router.get('/', function(req, res, next) {
 
 router.get('/mjpeg/:timestamp', function (req, res, next) {
 	var timestamp = req.params.timestamp;
-	console.log("***** GOT MJPEG request for id " +   timestamp);
 
 	// read files from public/images/capture/<timestamp>/mpjpeg
-
 	var dirPath = "public/images/capture/" + timestamp + "/mjpeg/";
 	fs.readdir(dirPath, function (err, files) {
 		if (err) {
 		throw err;
 		}
 		else {
+
 			res.writeHead(200, {
 				'Content-Type': 'multipart/x-mixed-replace; boundary=myboundary',
 				'Cache-Control': 'no-cache',
@@ -31,9 +30,7 @@ router.get('/mjpeg/:timestamp', function (req, res, next) {
 			sendNext();
 
 			function sendNext () {
-				console.log("count = " + i);
 				var filename = files[i];
-				console.log("Reading " + filename);
 				var content = fs.readFileSync(dirPath + filename);
 				if (content) {
 					res.write("--myboundary\r\n");
@@ -43,11 +40,7 @@ router.get('/mjpeg/:timestamp', function (req, res, next) {
 					res.write(content, 'binary');
 					res.write("\r\n");
 				}
-				else {
-					console.log("no content");
-				}
 				i = (i+1) % files.length;
-				console.log(i);
 				if (!stop) {
 					setTimeout(sendNext, 250);
 				};	
