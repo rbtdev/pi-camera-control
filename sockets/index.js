@@ -4,6 +4,7 @@ var ioStream = require('socket.io-stream');
 var Cameras = require('./cameras.js');
 var path = require('path');
 var moment = require('moment');
+var cloudinary = require('cloudinary');
 
 var fs = require('fs');
 var publicDir = "public";
@@ -69,14 +70,15 @@ function init(server) {
   }
 
   function readFrame(socket) {
-    return function (stream, data, cb) {
-      // save frame in timestamp mjpeg dir
-      var filename = path.basename(data.name);
-      var localDir =  publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/mjpeg/";
-      var fullPath = localDir + filename;
-      stream.on('finish', function () {
-      });
-      stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
+    return function (socketStream, data, cb) {
+      console.log("Piping frame to cloud...");
+      var camera = Cameras.findBySocket(socket);
+      var cloudStream = cloudinary.uploader.upload_stream(
+        function(result) { 
+          console.log(result) 
+          camera.addMjpegFrame(data.timestamp, result.secure_url);
+       });
+      socketStream.pipe(cloudStream);
     }
   }
 
@@ -89,26 +91,16 @@ function init(server) {
   };
 
   function sendImage (socket) {
-    return function(stream, data, cb) {
+    return function(socketStream, data, cb) {
+      console.log("Piping frame to cloud...");
       var camera = Cameras.findBySocket(socket);
-      var filename = "thumb_" + path.basename(data.name);
-      var localDir =  publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/";
-      var url = createThumbnailUrl(data.timestamp, filename);
-      camera.setThumbnailUrl(data.timestamp, url);
-      var fullPath =  publicDir + url;
-      try {
-        fs.mkdirSync(localDir);
-        fs.mkdirSync(localDir + "/mjpeg");
-      } catch (e) {
-        return console.log("Error creating directories.");
-      }
-      stream.on('finish', function () {
-          controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
-      });
-      stream.on('error', function () {
-        return console.log("Steam error - " + fullPath)
-      });
-      stream.pipe(fs.createWriteStream(fullPath, {mode: "0666"}));
+      var cloudStream = cloudinary.uploader.upload_stream(
+        function(result) { 
+          console.log(result) 
+          camera.setThumbnailUrl(data.timestamp, result.secure_url);
+          controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: result.secure_url});
+       });
+      socketStream.pipe(cloudStream);
     }
   };
 

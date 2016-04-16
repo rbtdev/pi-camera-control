@@ -24,6 +24,7 @@ Camera.prototype.setStatus = function (status) {
 
 Camera.prototype.addAlarm = function (alarm) {
   console.log("Creating alarm: " + JSON.stringify(alarm));
+  alarm.mjpegs = [];
   this.alarms.unshift(alarm);
 }
 
@@ -32,6 +33,13 @@ Camera.prototype.setThumbnailUrl = function (alarmId, url) {
   var alarm = this.findAlarmById(alarmId);
   if (alarm) {
     alarm.thumbUrl = url;
+  }
+}
+
+Camera.prototype.addMjpegFrame = function (alarmId, url) {
+  var alarm = this.findAlarmById(alarmId);
+  if (alarm) {
+    alarm.mjpegs.unshift(url);
   }
 }
 
