@@ -60,7 +60,7 @@ function setAlarm(cameraId, alarm) {
     var id = "#camera-"+cameraId;
     var $alarms = $(id).find('.alarms');
     var $alarmItem = $('<div>', {id: "alarm-" + cameraId + "-" + alarm.timestamp, class: 'row alarm'});
-    var $alarmText = $('<div>', {class: 'col-xs-8 timestamp',  text:  moment(alarm.timestamp, "YYYYMMDDHHmmss").format('MMM Do YYYY HH:mm:ss')})
+    var $alarmText = $('<div>', {class: 'col-xs-8 timestamp',  text:  moment.utc(alarm.timestamp, "YYYYMMDDHHmmss").local().format('MMM Do YYYY HH:mm:ss')})
     var $alarmImgCol = $('<div>', {class: 'col-xs-4'});
     var $alarmImgLink = $('<a>', {class: 'mjpeg-link'});
     var $alarmImg = $("<img>", {class: "alarm-image thumbnail"});
