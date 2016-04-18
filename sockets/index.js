@@ -4,10 +4,35 @@ var ioStream = require('socket.io-stream');
 var Cameras = require('./cameras.js');
 var path = require('path');
 var moment = require('moment');
-
+var Slack = require('slack-node');
 var fs = require('fs');
+ 
+slack = new Slack();
+slack.setWebhook("https://hooks.slack.com/services/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");
+
+
 var publicDir = "public";
 var imageDir= "images";
+
+function sendSlackAlert(message, imageUrl) {
+console.log("Image Url = " + imageUrl);
+var attachments = [
+        {
+            "fallback": message,
+            "image_url": imageUrl
+        }
+    ]
+  slack.webhook({
+      channel: "#pi-cam",
+      username: "pi-cam",
+      icon_emoji: ":ghost:",
+      text: message,
+      attachments: attachments
+    }, 
+    function(err, response) {
+      console.log(response);
+    });
+}
 
 function init(server) {
   var io = socketIo(server);
@@ -104,6 +129,7 @@ function init(server) {
       }
       stream.on('finish', function () {
           controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
+          sendSlackAlert("Motion Detected", "https://pi-control.herokuapp.com/" + url);
       });
       stream.on('error', function () {
         return console.log("Steam error - " + fullPath)
