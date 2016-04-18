@@ -18,14 +18,15 @@ function sendSlackAlert(message, imageUrl) {
 console.log("Image Url = " + imageUrl);
 var attachments = [
         {
-            "fallback": message,
-            "image_url": imageUrl
+            "fallback": imageUrl,
+            "thumb_url": imageUrl
         }
     ]
   slack.webhook({
       channel: "#pi-cam",
       username: "pi-cam",
       icon_emoji: ":ghost:",
+      title: "",
       text: message,
       attachments: attachments
     }, 
@@ -90,6 +91,7 @@ function init(server) {
       var url = "/mjpeg/" + timestamp;
       camera.setMjpegUrl(timestamp, url);
       controllerIo.emit('mjpeg', {id: camera.id, alarmId: timestamp, src: url});
+      sendSlackAlert("Motion Detected", "https://pi-control.herokuapp.com/" + url);
     }
   }
 
@@ -129,7 +131,6 @@ function init(server) {
       }
       stream.on('finish', function () {
           controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
-          sendSlackAlert("Motion Detected", "https://pi-control.herokuapp.com/" + url);
       });
       stream.on('error', function () {
         return console.log("Steam error - " + fullPath)
