@@ -19,7 +19,7 @@ console.log("Image Url = " + imageUrl);
 var attachments = [
         {
             "fallback": imageUrl,
-            "thumb_url": imageUrl
+            "image_url": imageUrl
         }
     ]
   slack.webhook({
