@@ -16,15 +16,8 @@ var imageDir= "images";
 
 function sendSlackAlert( source, imageUrl) {
   console.log("Image Url = " + imageUrl);
-  var attachments = [
-    {
-      "fallback": imageUrl,
-      "image_url": imageUrl
-    }
-  ]
   slack.webhook({
-      title: "Motion Detected by " + source,
-      text: "<" + imageUrl + "|Preview>"
+      text: "Motion Detected by " + source + "\n<" + imageUrl + "|Preview>"
     }, 
     function(err, response) {
       console.log(response);
