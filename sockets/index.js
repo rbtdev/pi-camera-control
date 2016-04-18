@@ -91,7 +91,6 @@ function init(server) {
       var url = "/mjpeg/" + timestamp;
       camera.setMjpegUrl(timestamp, url);
       controllerIo.emit('mjpeg', {id: camera.id, alarmId: timestamp, src: url});
-      sendSlackAlert("Motion Detected", "https://pi-control.herokuapp.com/" + url);
     }
   }
 
@@ -131,6 +130,7 @@ function init(server) {
       }
       stream.on('finish', function () {
           controllerIo.emit('thumbnail', {id: camera.id, alarmId: data.timestamp, src: url});
+          sendSlackAlert("Motion Detected", "https://pi-control.herokuapp.com/" + url);
       });
       stream.on('error', function () {
         return console.log("Steam error - " + fullPath)
