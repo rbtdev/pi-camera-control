@@ -19,15 +19,22 @@ function createCameraRow(cameraId) {
     var $statusRow = $('<div>', {class: 'row'});
     var $cameraName = $("<div>", {class: "col-xs-8 name"});
     var $buttonCol = $("<div>", {class: "col-xs-4 col-sm-2 col-md-1 col-lg-1"});
+    var $speakRow = $("<div>", {class: 'row'})
+    var $speakText = $("<input>", {id: cameraId+ "-speak-text", type: "text"});
+    var $speakButton = $("<button>", {type: "button", 'data-camera-id': cameraId, text: "Speak"});
     var $alarmsRow = $('<div>', {class: 'row'});
     var $alarms = $('<div>', {class: 'col-xs-12 alarms'});
     var $cameraButton = $("<button>", {type: "button", class: "status", 'data-camera-id': cameraId})
     $cameraButton.click(toggleStatus);
+    $speakButton.click(sendSpeach);
     $buttonCol.append($cameraButton);
+    $speakRow.append($speakText);
+    $speakRow.append($speakButton);
     $alarmsRow.append($alarms);
     $statusRow.append($cameraName);
     $statusRow.append($buttonCol);
     $cameraRow.append($statusRow);
+    $cameraRow.append($speakRow);
     $cameraRow.append($alarmsRow);
 
     return $cameraRow;
@@ -53,6 +60,14 @@ function toggleStatus() {
     controller.emit(event, {id: cameraId});
     return false
 };
+
+function sendSpeach() {
+    var cameraId = this.dataset.cameraId;
+    var textElement = $('#'+cameraId+"-speak-text");
+    var text = textElement[0].value;
+    console.log("Sending speech text: " + text)
+    controller.emit('speak', {id: cameraId, text:text})
+}
 
 
 

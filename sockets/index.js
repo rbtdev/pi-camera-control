@@ -37,6 +37,7 @@ function controller(server) {
     clientCount++;
     socket.on('activate', activateCamera);
     socket.on('deactivate', deactivateCamera);
+    socket.on('speak', sendSpeak);
     socket.on('disconnect', clientDisconnected)
     socket.emit('list', Cameras.list())
   }
@@ -56,6 +57,17 @@ function controller(server) {
     socket.on('disconnect', disconnectCamera(socket));
   }
 
+  function sendSpeak(message) {
+    console.log("Sending speak command " + message);
+    var camera = Cameras.findById(message.id);
+    if (camera) {
+      camera.socket.emit('speak', message.text);
+    }
+    else {
+      console.log ('Err - no such camera');
+    }
+  }
+
   function activateCamera(message) {
     console.log("Got activate event");
     var camera = Cameras.findById(message.id);
@@ -64,7 +76,6 @@ function controller(server) {
     }
     else {
       console.log("Err- no such camera");
-      socket.send({err: "no such camera"})
     }
   }
 
