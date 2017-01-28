@@ -10,7 +10,20 @@ body {
     position: fixed;
 }
 
+.row-centered {
+    text-align: center;
+}
+
+.col-centered {
+    display: inline-block;
+    text-align: left;
+    margin-right: -4px;
+}
+
 .form-login {
+    margin: auto;
+    float: none;
+    width: 250px;
     background-color: #EDEDED;
     padding-top: 10px;
     padding-bottom: 20px;
