@@ -11,8 +11,8 @@ $(document).ready(function () {
 });
 
 function login() {
-    var username = $("#username").val();
-    var password = $("#password").val();
+    var username = $("#username").val().trim();
+    var password = $("#password").val().trim();
     if (username.length > 0 && password.length > 0) {
         $.post("/login", {
                 username: username,

@@ -4,12 +4,12 @@ module.exports.isLoggedIn = isLoggedIn;
 function authenticate(username, password, done) {
     if (username !== 'rob') {
         return done(null, false, {
-            message: 'Incorrect username.'
+            message: 'Incorrect username'
         });
     }
     if (password !== 'password') {
         return done(null, false, {
-            message: 'Incorrect password.'
+            message: 'Incorrect password'
         });
     }
     var user = {

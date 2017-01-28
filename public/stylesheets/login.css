@@ -11,6 +11,7 @@ body {
 }
 
 .form-login {
+    float: none;
     margin: 0 auto;
     width: 250px;
     background-color: #EDEDED;
@@ -37,4 +38,9 @@ h4 {
 
 .wrapper {
     text-align: center;
+}
+
+#message {
+    border-bottom: #fff solid 1px;
+    height: 3em;
 }
