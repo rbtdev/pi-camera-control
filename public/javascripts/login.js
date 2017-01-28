@@ -1,11 +1,18 @@
 $(document).ready(function () {
 
     $("#login-button").on('click', login)
+    $("#password").on("keyup", function (event) {
+        if ($("#password").val().length > 72) {
+            $("#message").text('Password must be less than 72 characters');
+        } else {
+            $("#message").text('');
+        }
+    })
 
     $(document).on("keyup",
         function (event) {
-            if (event.which == 13) {
-                $("#login-button").trigger('click');
+            if (event.which === 13) {
+                login();
             }
         });
 });
