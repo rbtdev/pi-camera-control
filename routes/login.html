@@ -8,16 +8,21 @@
             <div class="col-md-offset-5 col-md-3">
                 <div class="form-login">
                     <h4>Login</h4>
-                    <input type="text" id="userName" class="form-control input-sm chat-input" placeholder="username" />
+                    <input type="text" id="username" class="form-control input-sm chat-input" placeholder="username" />
                     </br>
-                    <input type="text" id="userPassword" class="form-control input-sm chat-input" placeholder="password" />
+                    <input type="text" id="password" class="form-control input-sm chat-input" placeholder="password" />
                     </br>
                     <div class="wrapper">
                         <span class="group-btn">     
-                <a href="#" class="btn btn-primary btn-md">login <i class="fa fa-sign-in"></i></a>
-            </span>
+                            <a id="login-button" class="btn btn-primary btn-md">login <i class="fa fa-sign-in"></i></a>
+                        </span>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-5 col-md-3">
+                <span id="message"></span>
             </div>
         </div>
     </div>
@@ -28,5 +33,7 @@
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="javascripts/login.js">
+</script>
 
 </html>

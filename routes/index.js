@@ -1,13 +1,43 @@
 var express = require('express');
+var passport = require('passport');
 var router = express.Router();
+var auth = require('../controllers/auth');
 var fs = require('fs');
 
 router.get('/login', function (req, res, next) {
 	res.sendFile(__dirname + '/login.html');
 });
 
+router.post('/login', function (req, res, next) {
+	passport.authenticate('local', function (err, user, info) {
+		if (err) {
+			return next(err);
+		}
+		if (!user) {
+			return res.status(401).json({
+				errors: [info.message],
+				data: {}
+			})
+		}
+		req.logIn(user, function (err) {
+			if (err) {
+				return next(err);
+			}
+			return res.json({
+				errors: [],
+				data: {
+					user: user
+				}
+			})
+		});
+	})(req, res, next);
+});
+
+
+
+
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', auth.isLoggedIn, function (req, res, next) {
 	res.sendFile(__dirname + '/index.html');
 });
 
