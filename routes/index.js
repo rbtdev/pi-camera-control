@@ -2,9 +2,13 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 
+router.get('/login', function (req, res, next) {
+	res.sendFile(__dirname + '/login.html');
+});
+
 /* GET home page. */
-router.get('/', function(req, res, next) {
-    res.sendFile(__dirname + '/index.html');
+router.get('/', function (req, res, next) {
+	res.sendFile(__dirname + '/index.html');
 });
 
 router.get('/mjpeg/:timestamp', function (req, res, next) {
@@ -14,9 +18,8 @@ router.get('/mjpeg/:timestamp', function (req, res, next) {
 	var dirPath = "public/images/capture/" + timestamp + "/mjpeg/";
 	fs.readdir(dirPath, function (err, files) {
 		if (err) {
-		throw err;
-		}
-		else {
+			throw err;
+		} else {
 
 			res.writeHead(200, {
 				'Content-Type': 'multipart/x-mixed-replace; boundary=myboundary',
@@ -25,11 +28,13 @@ router.get('/mjpeg/:timestamp', function (req, res, next) {
 				'Pragma': 'no-cache'
 			});
 			var stop = false;
-			res.connection.on('close', function() { stop = true; });
+			res.connection.on('close', function () {
+				stop = true;
+			});
 			var i = 0;
 			sendNext();
 
-			function sendNext () {
+			function sendNext() {
 				var filename = files[i];
 				var content = fs.readFileSync(dirPath + filename);
 				if (content) {
@@ -40,13 +45,13 @@ router.get('/mjpeg/:timestamp', function (req, res, next) {
 					res.write(content, 'binary');
 					res.write("\r\n");
 				}
-				i = (i+1) % files.length;
+				i = (i + 1) % files.length;
 				if (!stop) {
 					setTimeout(sendNext, 250);
-				};	
+				};
 			}
 		}
-    });
+	});
 })
 
 module.exports = router;
