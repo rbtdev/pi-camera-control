@@ -27,10 +27,7 @@ var sessionOpts = {
   resave: false,
   saveUninitialized: true,
 }
-if (app.get('env') === 'production') {
-  app.set('trust proxy', 1) // trust first proxy
-  sessionOpts.cookie.secure = true // serve secure cookies
-}
+
 app.use(session(sessionOpts));
 
 // Passport stuff
