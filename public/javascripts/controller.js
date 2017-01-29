@@ -49,9 +49,9 @@ function createCameraRow(cameraId) {
         class: 'col-xs-12 alarms'
     });
     var $cameraButton = $(
-        '<button type="button" class="btn btn-default btn-sm">' +
+        '<a href="#" class="btn btn-default btn-lg status">' +
         '<span class="glyphicon glyphicon-off"></span>' +
-        '</button>')
+        '</a>')
     $cameraButton.attr('data-camera-id', cameraId);
     // var $cameraButton = $("<button>", {
     //     type: "button",
@@ -176,10 +176,10 @@ function setStatus(cameraId, status) {
         }
     }
     var btnStatus = buttonClasses[status].class;
-    var btnClass = "btn btn-default btn-sm " + btnStatus + " status";
+    var btnClass = "btn btn-default btn-lg " + btnStatus + " status";
     var btnText = buttonClasses[status].text;
     var $statusBtn = $(id).find('.status');
-    $statusBtn.text(btnText);
+    //$statusBtn("<a>").text(btnText);
     $statusBtn.attr('class', btnClass);
 }
 
