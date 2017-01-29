@@ -1,23 +1,25 @@
+var users = require('../models/users');
+
 module.exports.authenticate = authenticate;
 module.exports.isLoggedIn = isLoggedIn;
 
+
 function authenticate(username, password, done) {
-    if (username !== 'rob') {
-        return done(null, false, {
-            message: 'Incorrect username'
+    users.findByUsername(username, function (err, user) {
+        if (err) return done(err);
+        if (!user) return done(null, false, {
+            message: 'Invalid username'
         });
-    }
-    if (password !== 'password') {
+        // use bcrypt compare later
+        if (password === user.password) {
+            delete user.password;
+            return done(null, user);
+        }
         return done(null, false, {
             message: 'Incorrect password'
-        });
-    }
-    var user = {
-        id: 1,
-        username: username
-    }
-    return done(null, user);
-};
+        })
+    })
+}
 
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
