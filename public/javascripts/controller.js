@@ -48,11 +48,15 @@ function createCameraRow(cameraId) {
     var $alarms = $('<div>', {
         class: 'col-xs-12 alarms'
     });
-    var $cameraButton = $("<button>", {
-        type: "button",
-        class: "status",
-        'data-camera-id': cameraId
-    })
+    var $cameraButton = $(
+        '"<button type="button" class="btn btn-default btn-sm">' +
+        '<span class="glyphicon glyphicon-off"></span>' +
+        '</button>"')
+    // var $cameraButton = $("<button>", {
+    //     type: "button",
+    //     class: "btn btn-default btn-sm",
+    //     'data-camera-id': cameraId
+    // })
     $cameraButton.click(toggleStatus);
     $speakButton.click(sendSpeach);
     $buttonCol.append($cameraButton);
@@ -171,7 +175,7 @@ function setStatus(cameraId, status) {
         }
     }
     var btnStatus = buttonClasses[status].class;
-    var btnClass = "btn btn-block " + btnStatus + " status";
+    var btnClass = "btn btn-default btn-sm " + btnStatus;
     var btnText = buttonClasses[status].text;
     var $statusBtn = $(id).find('.status');
     $statusBtn.text(btnText);
@@ -183,7 +187,7 @@ function logout() {
 }
 
 function settings() {
-    alert("settings");
+
 }
 //
 // When loaded, set up app events
