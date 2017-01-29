@@ -49,9 +49,9 @@ function createCameraRow(cameraId) {
         class: 'col-xs-12 alarms'
     });
     var $cameraButton = $(
-        '"<button type="button" class="btn btn-default btn-sm">' +
+        '<button type="button" class="btn btn-default btn-sm">' +
         '<span class="glyphicon glyphicon-off"></span>' +
-        '</button>"')
+        '</button>')
     // var $cameraButton = $("<button>", {
     //     type: "button",
     //     class: "btn btn-default btn-sm",
