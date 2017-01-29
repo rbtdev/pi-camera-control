@@ -35,6 +35,15 @@ app.use(session(sessionOpts));
 passport.use(new LocalStrategy(auth.authenticate));
 passport.serializeUser(users.serialize)
 passport.deserializeUser(users.deserialize);
+
+if (app.get('env') === 'development') {
+  app.use(function (req, res, next) {
+    if (req.headers['x-forwarded-proto'] != 'https') {
+      res.redirect("https://" + req.headers.host + "/" + req.url);
+    } else next()
+  })
+}
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(logger('dev'));
