@@ -1,6 +1,5 @@
-
 #camera-list .row {
-	margin:10px;
+	margin: 10px;
 }
 
 #camera-list .name {
@@ -12,4 +11,12 @@
 
 .alarm img {
 	width: 160px;
+}
+
+
+/* Toolbar */
+
+#toolbar {
+	background: #444;
+	padding: 5px;
 }
