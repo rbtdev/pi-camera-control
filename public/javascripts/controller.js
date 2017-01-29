@@ -175,7 +175,7 @@ function setStatus(cameraId, status) {
         }
     }
     var btnStatus = buttonClasses[status].class;
-    var btnClass = "btn btn-default btn-sm " + btnStatus;
+    var btnClass = "btn btn-default btn-sm " + btnStatus + " status";
     var btnText = buttonClasses[status].text;
     var $statusBtn = $(id).find('.status');
     $statusBtn.text(btnText);
@@ -186,9 +186,7 @@ function logout() {
     window.location = '/logout'
 }
 
-function settings() {
-
-}
+function settings() {}
 //
 // When loaded, set up app events
 //
