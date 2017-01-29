@@ -39,7 +39,7 @@ passport.deserializeUser(users.deserialize);
 if (app.get('env') === 'production') {
   app.use(function (req, res, next) {
     if (req.headers['x-forwarded-proto'] != 'https') {
-      res.redirect("https://" + req.headers.host + "/" + req.url);
+      res.redirect("https://" + req.headers.host + req.url);
     } else next()
   })
 }
