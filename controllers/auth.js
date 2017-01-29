@@ -6,6 +6,7 @@ module.exports.isLoggedIn = isLoggedIn;
 
 function authenticate(username, password, done) {
     users.findByUsername(username, function (err, user) {
+        conseole.log("User lookup: " + JSON.stringify(user, null, 2))
         if (err) return done(err);
         if (!user) return done(null, false, {
             message: 'Invalid username'
