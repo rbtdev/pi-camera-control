@@ -3,12 +3,19 @@ var users = [{
     username: 'rob',
     password: 'password'
 }]
+
 module.exports.findByUsername = function (username, cb) {
     setImmediate(function () {
         var user = null;
         users.forEach(function (_user) {
-            if (_user.username == username) user = _user;
-        })
+            if (_user.username == username) {
+                user = {
+                    id: _user.id,
+                    username: _user.username,
+                    password: _user.password
+                }
+            }
+        });
         return cb(null, user);
     })
 }
