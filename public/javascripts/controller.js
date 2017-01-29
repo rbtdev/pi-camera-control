@@ -52,6 +52,7 @@ function createCameraRow(cameraId) {
         '<button type="button" class="btn btn-default btn-sm">' +
         '<span class="glyphicon glyphicon-off"></span>' +
         '</button>')
+    $cameraButton.attr('data-camera-id', cameraId);
     // var $cameraButton = $("<button>", {
     //     type: "button",
     //     class: "btn btn-default btn-sm",
