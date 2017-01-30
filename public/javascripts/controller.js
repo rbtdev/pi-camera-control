@@ -28,7 +28,7 @@ function createCameraRow(cameraId) {
         class: "col-xs-8 name"
     });
     var $buttonCol = $("<div>", {
-        class: "col-xs-4 col-sm-2 col-md-1 col-lg-1"
+        class: "col-xs-6 col-sm-4 col-md-2 col-lg-2"
     });
     var $speakRow = $("<div>", {
         class: 'row'
@@ -55,7 +55,7 @@ function createCameraRow(cameraId) {
     $cameraButton.attr('data-camera-id', cameraId);
 
     var $captureButton = $(
-        '<a href="#" class="btn btn-default btn-lg status">' +
+        '<a href="#" class="btn btn-default btn-lg capture">' +
         '<span class="glyphicon glyphicon-facetime-video"></span>' +
         '</a>')
     $captureButton.attr('data-camera-id', cameraId);
