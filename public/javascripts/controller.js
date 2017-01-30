@@ -53,14 +53,18 @@ function createCameraRow(cameraId) {
         '<span class="glyphicon glyphicon-off"></span>' +
         '</a>')
     $cameraButton.attr('data-camera-id', cameraId);
-    // var $cameraButton = $("<button>", {
-    //     type: "button",
-    //     class: "btn btn-default btn-sm",
-    //     'data-camera-id': cameraId
-    // })
+
+    var $captureButton = $(
+        '<a href="#" class="btn btn-default btn-lg status">' +
+        '<span class="glyphicon glyphicon-facetime-video"></span>' +
+        '</a>')
+    $captureButton.attr('data-camera-id', cameraId);
+
     $cameraButton.click(toggleStatus);
+    $captureButton.click(sendCapture);
     $speakButton.click(sendSpeach);
     $buttonCol.append($cameraButton);
+    $buttonCol.append($captureButton);
     $speakRow.append($speakText);
     $speakRow.append($speakButton);
     $alarmsRow.append($alarms);
@@ -107,7 +111,13 @@ function sendSpeach() {
     })
 }
 
-
+function sendCapture() {
+    var cameraId = this.dataset.cameraId;
+    console.log("Sending capture event for cameraId: " + cameraId)
+    controller.emit('capture', {
+        id: cameraId
+    })
+}
 
 function setAlarm(cameraId, alarm) {
     var id = "#camera-" + cameraId;
