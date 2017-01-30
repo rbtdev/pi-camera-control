@@ -28,7 +28,7 @@ function createCameraRow(cameraId) {
         class: "col-xs-8 name"
     });
     var $buttonCol = $("<div>", {
-        class: "col-xs-6 col-sm-4 col-md-2 col-lg-2"
+        class: "col-xs-12 col-sm-6 col-md-2 col-lg-2"
     });
     var $speakRow = $("<div>", {
         class: 'row'
