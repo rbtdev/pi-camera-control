@@ -8,11 +8,14 @@ body {
 .container {
     padding: 25px;
     position: fixed;
+    text-align: center;
+    width: 100%;
 }
 
 .form-login {
     float: none;
     margin: 0 auto;
+    margin-top: 50px;
     width: 250px;
     background-color: #EDEDED;
     padding-top: 10px;
