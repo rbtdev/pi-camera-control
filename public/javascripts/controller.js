@@ -162,6 +162,8 @@ function setThumbnail(cameraId, alarmId, src) {
 function setMjpeg(cameraId, alarmId, url) {
     var id = '#alarm-' + cameraId + "-" + alarmId;
     var link = $(id).find(".mjpeg-link");
+    var thumbnail = $(id).find(".alarm-image");
+    thumbnail.attr("src", url);
     link.attr("href", url);
     link.attr("target", "_blank");
 }
