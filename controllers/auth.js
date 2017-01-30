@@ -1,22 +1,22 @@
 var users = require('../models/users');
+var bcrypt = require('bcrypt');
 
 module.exports.authenticate = authenticate;
 module.exports.isLoggedIn = isLoggedIn;
 
-
 function authenticate(username, password, done) {
-    users.findByUsername(username, function (err, user) {
+    users.findByUsername(username.trim().toLowerCase(), function (err, user) {
         if (err) return done(err);
         if (!user) return done(null, false, {
             message: 'Invalid username'
         });
-        // use bcrypt compare later
-        if (password === user.password) {
+        bcrypt.compare(password, user.password, function (err, match) {
+            if (err) return done(err);
+            if (!match) return done(null, false, {
+                message: 'Incorrect password'
+            });
             delete user.password;
-            return done(null, user);
-        }
-        return done(null, false, {
-            message: 'Incorrect password'
+            return done(null, user)
         })
     })
 }

@@ -1,10 +1,10 @@
 var users = [{
     id: 0,
     username: 'rob',
-    password: 'password'
+    password: '$2a$10$fzd7h9BAPg4pCKqZu2oDr.k4RokBIVVsAmuBQor.n42EDPASHnGza'
 }]
 
-module.exports.findByUsername = function (username, cb) {
+module.exports.findByUsername = function findByUsername(username, cb) {
     setImmediate(function () {
         var user = null;
         users.forEach(function (_user) {
