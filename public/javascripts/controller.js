@@ -154,18 +154,27 @@ function setAlarm(cameraId, alarm) {
 
 function setThumbnail(cameraId, alarmId, src) {
     var id = "#alarm-" + cameraId + "-" + alarmId;
+    console.log("Setting img src: id = " + id + " src = " + src)
     $(id).find(".alarm-image").error(function (e) {
         console.log('image error');
     }).attr("src", src)
 }
 
+function hoverSrc(cameraId, alarmId, url) {
+    return function () {
+        console.log("Setting src");
+        setThumbnail(cameraId, alarmId, url);
+    }
+}
+
 function setMjpeg(cameraId, alarmId, url) {
     var id = '#alarm-' + cameraId + "-" + alarmId;
     var link = $(id).find(".mjpeg-link");
-    var thumbnail = $(id).find(".alarm-image");
-    thumbnail.attr("src", url);
     link.attr("href", url);
     link.attr("target", "_blank");
+    var thumbSrc = $(id).find('.alarm-image').attr('src');
+    link.hover(hoverSrc(cameraId, alarmId, url), hoverSrc(cameraId, alarmId, thumbSrc));
+
 }
 
 function setStatus(cameraId, status) {
