@@ -221,9 +221,9 @@ function setPage(page) {
 }
 $(document).ready(function () {
     $('#logout').on('click', logout);
-    $('#settings').on('click', setPage('settings'));
-    $('#profile').on('click', setPage('profile'));
-    $('#cameras').on('click', setPage('cameras'));
+    $('#settings-nav').on('click', setPage('settings'));
+    $('#profile-nav').on('click', setPage('profile'));
+    $('#cameras-nav').on('click', setPage('cameras'));
 
     setPage("cameras")();
 
