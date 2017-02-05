@@ -208,6 +208,38 @@ function logout() {
     window.location = '/logout'
 }
 
+
+function addPageLinks(navBar) {
+    var pages = [{
+            title: "cameras",
+            icon: "facetime-video"
+        },
+        {
+            title: "settings",
+            icon: "cog"
+        },
+        {
+            title: "profile",
+            icon: "user"
+        },
+        {
+            title: "logout",
+            icon: "log-out"
+        }
+    ]
+
+    var navList = $(navBar).find("ul");
+    pages.forEach(function (page) {
+        var linkHtml = '<li><a id="' + page.title + '-nav" href="#" data-toggle="collapse" data-target="' + navBar + '">' +
+            '<span class="glyphicon glyphicon-' + page.icon + '"></span> ' + page.title + '</a>'
+        var link = $(linkHtml);
+        if (page.title === 'logout') link.on('click', logout);
+        else link.on('click', setPage(page.title));
+        navList.append(link);
+    })
+
+}
+
 function setTitle(title) {
     $("#page-title").text(title);
 }
@@ -220,11 +252,8 @@ function setPage(page) {
     }
 }
 $(document).ready(function () {
-    $('#logout').on('click', logout);
-    $('#settings-nav').on('click', setPage('settings'));
-    $('#profile-nav').on('click', setPage('profile'));
-    $('#cameras-nav').on('click', setPage('cameras'));
 
+    addPageLinks('#myNavbar')
     setPage("cameras")();
 
     /**
