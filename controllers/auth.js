@@ -2,7 +2,6 @@ var users = require('../models/users');
 var bcrypt = require('bcrypt');
 
 module.exports.authenticate = authenticate;
-module.exports.isLoggedIn = isLoggedIn;
 
 function authenticate(username, password, done) {
     users.findByUsername(username.trim().toLowerCase(), function (err, user) {
@@ -19,12 +18,4 @@ function authenticate(username, password, done) {
             return done(null, user)
         })
     })
-}
-
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        res.redirect('/login');
-    }
 }

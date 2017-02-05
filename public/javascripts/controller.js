@@ -208,13 +208,24 @@ function logout() {
     window.location = '/logout'
 }
 
-function settings() {}
-//
-// When loaded, set up app events
-//
+function setTitle(title) {
+    $("#page-title").text(title);
+}
+
+function setPage(page) {
+    return function () {
+        $(".page").toggle(false);
+        $("#" + page + "-page").toggle(true);
+        setTitle(page);
+    }
+}
 $(document).ready(function () {
     $('#logout').on('click', logout);
-    $('#settings').on('click', settings);
+    $('#settings').on('click', setPage('settings'));
+    $('#profile').on('click', setPage('profile'));
+    $('#cameras').on('click', setPage('cameras'));
+
+    setPage("cameras")();
 
     /**
      * Handle socket events

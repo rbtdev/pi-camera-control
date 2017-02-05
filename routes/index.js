@@ -1,5 +1,6 @@
 var express = require('express');
-var auth = require('../controllers/auth');
+var auth = require('./auth');
+var pwReset = require('./password-reset');
 var login = require('./login');
 var mjpeg = require('./mjpeg');
 
@@ -22,6 +23,7 @@ router.get('/logout', function (req, res) {
 
 // API
 router.post('/login', login)
+router.post('/pw-reset', pwReset);
 router.get('/mjpeg/:timestamp', auth.isLoggedIn, mjpeg);
 
 module.exports = router;

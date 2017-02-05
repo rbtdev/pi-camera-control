@@ -28,3 +28,16 @@
 	background: #444;
 	padding: 5px;
 }
+
+#profile-div {
+	display: none;
+}
+
+#page-title {
+	color: white;
+	text-transform: capitalize;
+}
+
+.page {
+	display: none;
+}
