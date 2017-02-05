@@ -1,33 +1,27 @@
-var users = [{
-    id: 0,
-    username: 'rob',
-    password: '$2a$10$fzd7h9BAPg4pCKqZu2oDr.k4RokBIVVsAmuBQor.n42EDPASHnGza'
-}]
+var db = require('../lib/db');
 
 module.exports.findByUsername = function findByUsername(username, cb) {
-    setImmediate(function () {
-        var user = null;
-        users.forEach(function (_user) {
-            if (_user.username == username) {
-                user = {
-                    id: _user.id,
-                    username: _user.username,
-                    password: _user.password
-                }
-            }
-        });
-        return cb(null, user);
+    var query = {
+        sql: "SELECT * from USERS where username = $1",
+        params: [username]
+    }
+    db.query(query, function (err, result) {
+        if (err) return cb(err);
+        return cb(null, result.rows[0]);
     })
 }
 
 module.exports.findById = findById;
 
 function findById(id, cb) {
-    var user = null;
-    users.forEach(function (_user) {
-        if (_user.id === id) user = _user;
+    var query = {
+        sql: "SELECT * from USERS where id = $1",
+        params: [id]
+    }
+    db.query(query, function (err, result) {
+        if (err) return cb(err);
+        return cb(null, result.rows[0]);
     })
-    return cb(null, user);
 }
 
 module.exports.serialize = function (user, done) {
