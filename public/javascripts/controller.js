@@ -200,75 +200,113 @@ function setStatus(cameraId, status) {
     $statusBtn.attr('class', btnClass);
 }
 
-function logout() {
-    window.location = '/logout'
-}
-
-
-function addPageLinks(navBar) {
-    var menuItems = [{
-            title: "cameras",
-            icon: "facetime-video",
-            page: "cameras"
-        },
-        {
-            title: "settings",
-            icon: "cog",
-            page: "settings"
-        },
-        {
-            title: "profile",
-            icon: "user",
-            page: "profile"
-        },
-        {
-            title: "logout",
-            icon: "log-out",
-            action: logout
-        }
-    ]
-
-    var navList = $(navBar).find("ul");
-    menuItems.forEach(function (page) {
-        var linkHtml = '<li><a id="' + page.title + '-nav" class = "nav-link" href="#" data-toggle="collapse" data-target="' + navBar + '">' +
+function addPageLinks(pages) {
+    var navList = $('#myNavbar').find("ul");
+    pages.forEach(function (page) {
+        var linkHtml = '<li><a id="' + page.title + '-nav" class = "nav-link" href="#">' +
             '<span class="glyphicon glyphicon-' + page.icon + '"></span> ' + page.title + '</a>'
         var link = $(linkHtml);
         if (page.action) link.on('click', page.action);
-        else if (page.page) {
-            addPageHtml(page.page);
-            link.on('click', setPage(page.page));
+        else if (page.id) {
+            addPageHtml(page.id);
+            link.on('click', setPage(page));
         }
         navList.append(link);
     })
 
-    function addPageHtml(page) {
-        var html = "<div id='" + page + "-page' class='container-fluid page'>" +
+    function addPageHtml(id) {
+        var html = "<div id='" + id + "-page' class='container-fluid page'>" +
             "<div class='row'>" +
-            "<div id='" + page + "' class='col-xs-12'></div>" +
+            "<div id='" + id + "' class='col-xs-12'></div>" +
             "</div>" +
             "</div>";
         $('#app').append(html);
     }
 }
 
-function setTitle(title) {
-    $("#page-title").text(title);
+function setTitle(page) {
+    $("#page-title").text(page.title);
 }
 
 function setPage(page) {
     return function () {
         $(".page").toggle(false);
-        $("#" + page + "-page").toggle(true);
+        $("#" + page.id + "-page").toggle(true);
         setTitle(page);
+        page.controller();
     }
 }
 
+//
+// Controllers
+//
 
+function logout() {
+    window.location = '/logout'
+}
+
+function settings() {
+    $.get('/settings', function (data) {
+        renderPage(data);
+    });
+
+    function renderPage(data) {
+        console.log(JSON.stringify(data, null, 2));
+        var html = "<div id = 'settings-data'><pre>" + JSON.stringify(data, null, 2) + "</pre></div>"
+        $('#settings-data').remove();
+        $('#settings').append(html);
+    }
+}
+
+function profile() {
+    $.get('/profile', function (response) {
+        renderPage(response.data);
+    });
+
+    function renderPage(profile) {
+        console.log(JSON.stringify(profile, null, 2));
+        var html = "<div id = 'profile-data'>" +
+            "<img src = '" + profile.user.avatar + "' class='img-thumbnail'>" +
+            "</div>" +
+            "</div>";
+        $('#profile-data').remove();
+        $('#profile').append(html);
+    }
+}
+
+function cameras() {
+
+}
+
+var pages = [{
+        title: "cameras",
+        icon: "facetime-video",
+        id: "cameras",
+        controller: cameras
+    },
+    {
+        title: "settings",
+        icon: "cog",
+        id: "settings",
+        controller: settings
+    },
+    {
+        title: "profile",
+        icon: "user",
+        id: "profile",
+        controller: profile
+    },
+    {
+        title: "logout",
+        icon: "log-out",
+        controller: logout
+    }
+]
 
 $(document).ready(function () {
 
-    addPageLinks('#myNavbar')
-    setPage("cameras")();
+    addPageLinks(pages)
+    setPage(pages[0])();
 
     /**
      * Handle socket events
