@@ -38,6 +38,10 @@
 	text-transform: capitalize;
 }
 
+.nav-link {
+	text-transform: capitalize;
+}
+
 .page {
 	display: none;
 }

@@ -3,20 +3,17 @@ var cameraList = {};
 
 function listCameras(cameras) {
     $('#camera-list').remove();
-    var $cameraList = $("<div>", {
-        id: "camera-list"
-    });
-    $('#cameras').append($cameraList);
+    $('#cameras').append("<div id = 'camera-list'></div>");
 
     for (cameraId in cameras) {
-        var $cameraRow = createCameraRow(cameraId);
+        var $cameraRow = cameraRow(cameraId);
         $cameraList.append($cameraRow)
         updateCameraRow(cameraId);
     }
 
 }
 
-function createCameraRow(cameraId) {
+function cameraRow(cameraId) {
     var $cameraRow = $("<div>", {
         id: "camera-" + cameraId,
         class: "row"
@@ -173,8 +170,7 @@ function setMjpeg(cameraId, alarmId, url) {
     link.attr("href", url);
     link.attr("target", "_blank");
     var thumbSrc = $(id).find('.alarm-image').attr('src');
-    link.hover(hoverSrc(cameraId, alarmId, url), hoverSrc(cameraId, alarmId, thumbSrc));
-
+    // link.hover(hoverSrc(cameraId, alarmId, url), hoverSrc(cameraId, alarmId, thumbSrc));
 }
 
 function setStatus(cameraId, status) {
@@ -210,34 +206,49 @@ function logout() {
 
 
 function addPageLinks(navBar) {
-    var pages = [{
+    var menuItems = [{
             title: "cameras",
-            icon: "facetime-video"
+            icon: "facetime-video",
+            page: "cameras"
         },
         {
             title: "settings",
-            icon: "cog"
+            icon: "cog",
+            page: "settings"
         },
         {
             title: "profile",
-            icon: "user"
+            icon: "user",
+            page: "profile"
         },
         {
             title: "logout",
-            icon: "log-out"
+            icon: "log-out",
+            action: logout
         }
     ]
 
     var navList = $(navBar).find("ul");
-    pages.forEach(function (page) {
-        var linkHtml = '<li><a id="' + page.title + '-nav" href="#" data-toggle="collapse" data-target="' + navBar + '">' +
+    menuItems.forEach(function (page) {
+        var linkHtml = '<li><a id="' + page.title + '-nav" class = "nav-link" href="#" data-toggle="collapse" data-target="' + navBar + '">' +
             '<span class="glyphicon glyphicon-' + page.icon + '"></span> ' + page.title + '</a>'
         var link = $(linkHtml);
-        if (page.title === 'logout') link.on('click', logout);
-        else link.on('click', setPage(page.title));
+        if (page.action) link.on('click', page.action);
+        else if (page.page) {
+            addPageHtml(page.page);
+            link.on('click', setPage(page.page));
+        }
         navList.append(link);
     })
 
+    function addPageHtml(page) {
+        var html = "<div id='" + page + "-page' class='container-fluid page'>" +
+            "<div class='row'>" +
+            "<div id='" + page + "' class='col-xs-12'></div>" +
+            "</div>" +
+            "</div>";
+        $('#app').append(html);
+    }
 }
 
 function setTitle(title) {
@@ -251,6 +262,9 @@ function setPage(page) {
         setTitle(page);
     }
 }
+
+
+
 $(document).ready(function () {
 
     addPageLinks('#myNavbar')

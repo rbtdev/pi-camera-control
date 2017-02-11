@@ -29,11 +29,8 @@ function login() {
                 window.location = "/";
             })
             .fail(function (resp) {
-                var message = "Please try again"
-                var data = resp.responseJSON
-                if (data.errors.length) {
-                    message = data.errors[0]
-                }
+                var message = "Please try later"
+                console.log(JSON.stringify(resp, null, 2))
                 $("#message").text(message);
             })
     } else {
