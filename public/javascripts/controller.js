@@ -206,11 +206,8 @@ function addPageLinks(pages) {
         var linkHtml = '<li><a id="' + page.title + '-nav" class = "nav-link" href="#">' +
             '<span class="glyphicon glyphicon-' + page.icon + '"></span> ' + page.title + '</a>'
         var link = $(linkHtml);
-        if (page.action) link.on('click', page.action);
-        else if (page.id) {
-            addPageHtml(page.id);
-            link.on('click', setPage(page));
-        }
+        if (page.id) addPageHtml(page.id);
+        link.on('click', setPage(page));
         navList.append(link);
     })
 
@@ -230,9 +227,11 @@ function setTitle(page) {
 
 function setPage(page) {
     return function () {
-        $(".page").toggle(false);
-        $("#" + page.id + "-page").toggle(true);
-        setTitle(page);
+        if (page.id) {
+            $(".page").toggle(false);
+            $("#" + page.id + "-page").toggle(true);
+            setTitle(page);
+        }
         page.controller();
     }
 }
