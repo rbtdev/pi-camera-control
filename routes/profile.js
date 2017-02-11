@@ -1,15 +1,13 @@
-var profile = {
-    user: {
-        name: "Rob Thuleen",
-        email: "rob.thuleen@gmail.com",
-        avatar: 'https://ca.slack-edge.com/T03M9UG6B-U03M9UG6D-071637bee8a2-48'
-    }
-}
+var users = require('../models/users');
 
 module.exports.read = function (req, res, next) {
-    res.json({
-        errors: [],
-        data: profile
+
+    users.getProfileById(req.user.id, function (err, profile) {
+        if (err) return next(err);
+        return res.json({
+            errors: [],
+            data: profile
+        })
     })
 }
 

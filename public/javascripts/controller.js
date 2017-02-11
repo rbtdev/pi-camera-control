@@ -265,6 +265,8 @@ function profile() {
     function renderPage(profile) {
         console.log(JSON.stringify(profile, null, 2));
         var html = "<div id = 'profile-data'>" +
+            "<div id = 'profile-username'>" + profile.user.name + "</div>" +
+            "<div id = 'profile-email'>" + profile.user.email + "</div>" +
             "<img src = '" + profile.user.avatar + "' class='img-thumbnail'>" +
             "</div>" +
             "</div>";

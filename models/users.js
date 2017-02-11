@@ -24,6 +24,25 @@ function findById(id, cb) {
     })
 }
 
+module.exports.getProfileById = function getProfileById(uid, cb) {
+    var query = {
+        sql: "SELECT * from PROFILE where uid = $1",
+        params: [uid]
+    }
+    db.query(query, function (err, result) {
+        if (err) return cb(err);
+        var profile = {
+            user: {}
+        };
+        if (result.rows.length) {
+            profile.user.name = result.rows[0].first_name + " " + result.rows[0].last_name;
+            profile.user.email = result.rows[0].email;
+            profile.user.avatar = result.rows[0].avatar;
+        }
+        return cb(null, profile);
+    })
+}
+
 module.exports.serialize = function (user, done) {
     return done(null, user.id);
 };
