@@ -7,7 +7,7 @@ function listCameras(cameras) {
 
     for (cameraId in cameras) {
         var $cameraRow = cameraRow(cameraId);
-        $cameraList.append($cameraRow)
+        $('#camera-list').append($cameraRow)
         updateCameraRow(cameraId);
     }
 
