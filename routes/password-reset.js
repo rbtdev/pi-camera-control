@@ -12,7 +12,8 @@ module.exports = function (req, res, next) {
             data: {}
         })
 
-        // Authenticated - Log in user to the session
+        // Authenticated - Set new password
+
         req.logIn(user, function (err) {
             if (err) return next(err);
             return res.json({

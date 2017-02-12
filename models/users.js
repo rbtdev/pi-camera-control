@@ -24,6 +24,17 @@ function findById(id, cb) {
     })
 }
 
+module.exports.getSettingsById = function getSettingsById(uid, cb) {
+    var query = {
+        sql: "SELECT settings from SETTINGS where uid = $1",
+        params: [uid]
+    }
+    db.query(query, function (err, result) {
+        if (err) return cb(err);
+        return cb(null, result.rows[0].settings);
+    });
+};
+
 module.exports.getProfileById = function getProfileById(uid, cb) {
     var query = {
         sql: "SELECT * from PROFILE where uid = $1",

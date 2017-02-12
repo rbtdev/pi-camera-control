@@ -1,14 +1,13 @@
-var settings = {
-    notifications: {
-        slack: true
-    }
-}
+var users = require('../models/users');
 
 module.exports.read = function read(req, res, next) {
-    res.json({
-        errors: [],
-        data: settings
-    });
+    users.getSettingsById(req.user.id, function (err, settings) {
+        if (err) return next(err);
+        return res.json({
+            errors: [],
+            data: settings
+        })
+    })
 }
 
 module.exports.update = function update(req, res, next) {

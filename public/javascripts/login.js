@@ -30,6 +30,9 @@ function login() {
             })
             .fail(function (resp) {
                 var message = "Please try later"
+                if (resp.responseJSON && resp.responseJSON.errors && resp.responseJSON.errors.length) {
+                    message = resp.responseJSON.errors[0];
+                }
                 console.log(JSON.stringify(resp, null, 2))
                 $("#message").text(message);
             })

@@ -245,28 +245,39 @@ function logout() {
 }
 
 function settings() {
-    $.get('/settings', function (data) {
-        renderPage(data);
-    });
+    $.get('/settings')
+        .done(function (response) {
+            var settings = response.data;
+            renderPage(settings);
+        })
 
-    function renderPage(data) {
-        console.log(JSON.stringify(data, null, 2));
-        var html = "<div id = 'settings-data'><pre>" + JSON.stringify(data, null, 2) + "</pre></div>"
+    function renderPage(settings) {
+        console.log(JSON.stringify(settings, null, 2));
+        var html = "<div id = 'settings-data'><pre>" + JSON.stringify(settings, null, 2) + "</pre></div>"
         $('#settings-data').remove();
         $('#settings').append(html);
     }
 }
 
 function profile() {
-    $.get('/profile', function (response) {
-        renderPage(response.data);
-    });
+    $.get('/profile')
+        .done(function (response) {
+            renderPage(response.data);
+        });
 
     function renderPage(profile) {
         console.log(JSON.stringify(profile, null, 2));
-        var html = "<div id = 'profile-data'>" +
-            "<div id = 'profile-username'>" + profile.user.name + "</div>" +
-            "<div id = 'profile-email'>" + profile.user.email + "</div>" +
+        var html =
+            "<div id = 'profile-data class = 'col-xs-12'>" +
+            "<div class = 'col-xs-6'>" +
+            "<div class = 'row' id = 'profile-username'>" +
+            "<div class = 'col-xs-2'>Username</div><div class = 'col-xs-2'><textarea>" + profile.user.name + "</textarea></div>" +
+            "</div>" +
+            "<div class = 'row' id = 'profile-email'>" +
+            "<div class = 'col-xs-2'>Email</div><div class = 'col-xs-2'><textarea>" + profile.user.email + "</textarea></div>" +
+            "</div>" +
+            "</div>" +
+            "<div class = 'col-xs-6'>" +
             "<img src = '" + profile.user.avatar + "' class='img-thumbnail'>" +
             "</div>" +
             "</div>";
