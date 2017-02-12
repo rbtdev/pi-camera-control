@@ -1,4 +1,41 @@
-var controller
+var moment = require('moment');
+var $ = require('jquery');
+
+var controller;
+
+
+module.exports.listen = function listen() {
+    /**
+     * Handle socket events
+     */
+    controller = io.connect('/controller')
+    controller
+        .on('connect', function (socket) {
+            console.log("Controller connected");
+        })
+        .on('status', function (status) {
+            console.log("Got status for " + status.id + " - " + status.status)
+            setStatus(status.id, status.status);
+        })
+        .on('alarm', function (alarm) {
+            console.log("Got alarm signal for camera " + alarm.id + " - " + alarm.type);
+            setAlarm(alarm.id, alarm);
+        })
+        .on('thumbnail', function (image) {
+            console.log("Got image from camera " + image.id);
+            // set thumbnail to image
+            setThumbnail(image.id, image.alarmId, image.src);
+        })
+        .on('list', function (cameras) {
+            cameraList = cameras;
+            listCameras(cameras);
+        })
+        .on('mjpeg', function (url) {
+            setMjpeg(url.id, url.alarmId, url.src);
+            console.log("Got MJPEG URL " + url);
+        })
+}
+
 var cameraList = {};
 
 function listCameras(cameras) {
@@ -10,7 +47,6 @@ function listCameras(cameras) {
         $('#camera-list').append($cameraRow)
         updateCameraRow(cameraId);
     }
-
 }
 
 function cameraRow(cameraId) {
@@ -152,7 +188,7 @@ function setAlarm(cameraId, alarm) {
 function setThumbnail(cameraId, alarmId, src) {
     var id = "#alarm-" + cameraId + "-" + alarmId;
     console.log("Setting img src: id = " + id + " src = " + src)
-    $(id).find(".alarm-image").error(function (e) {
+    $(id).find(".alarm-image").on('error', function (e) {
         console.log('image error');
     }).attr("src", src)
 }
@@ -199,155 +235,3 @@ function setStatus(cameraId, status) {
     //$statusBtn("<a>").text(btnText);
     $statusBtn.attr('class', btnClass);
 }
-
-function addPageLinks(pages) {
-    var navList = $('#myNavbar').find("ul");
-    pages.forEach(function (page) {
-        var linkHtml = '<li><a id="' + page.title + '-nav" class = "nav-link" href="#">' +
-            '<span class="glyphicon glyphicon-' + page.icon + '"></span> ' + page.title + '</a>'
-        var link = $(linkHtml);
-        if (page.id) addPageHtml(page.id);
-        link.on('click', setPage(page));
-        navList.append(link);
-    })
-
-    function addPageHtml(id) {
-        var html = "<div id='" + id + "-page' class='container-fluid page'>" +
-            "<div class='row'>" +
-            "<div id='" + id + "' class='col-xs-12'></div>" +
-            "</div>" +
-            "</div>";
-        $('#app').append(html);
-    }
-}
-
-function setTitle(page) {
-    $("#page-title").text(page.title);
-}
-
-function setPage(page) {
-    return function () {
-        if (page.id) {
-            $(".page").toggle(false);
-            $("#" + page.id + "-page").toggle(true);
-            setTitle(page);
-        }
-        page.controller();
-    }
-}
-
-//
-// Controllers
-//
-
-function logout() {
-    window.location = '/logout'
-}
-
-function settings() {
-    $.get('/settings')
-        .done(function (response) {
-            var settings = response.data;
-            renderPage(settings);
-        })
-
-    function renderPage(settings) {
-        console.log(JSON.stringify(settings, null, 2));
-        var html = "<div id = 'settings-data'><pre>" + JSON.stringify(settings, null, 2) + "</pre></div>"
-        $('#settings-data').remove();
-        $('#settings').append(html);
-    }
-}
-
-function profile() {
-    $.get('/profile')
-        .done(function (response) {
-            renderPage(response.data);
-        });
-
-    function renderPage(profile) {
-        console.log(JSON.stringify(profile, null, 2));
-        var html =
-            "<div id = 'profile-data class = 'col-xs-12'>" +
-            "<div class = 'col-xs-6'>" +
-            "<div class = 'row' id = 'profile-username'>" +
-            "<div class = 'col-xs-2'>Username</div><div class = 'col-xs-2'><textarea>" + profile.user.name + "</textarea></div>" +
-            "</div>" +
-            "<div class = 'row' id = 'profile-email'>" +
-            "<div class = 'col-xs-2'>Email</div><div class = 'col-xs-2'><textarea>" + profile.user.email + "</textarea></div>" +
-            "</div>" +
-            "</div>" +
-            "<div class = 'col-xs-6'>" +
-            "<img src = '" + profile.user.avatar + "' class='img-thumbnail'>" +
-            "</div>" +
-            "</div>";
-        $('#profile-data').remove();
-        $('#profile').append(html);
-    }
-}
-
-function cameras() {
-
-}
-
-var pages = [{
-        title: "cameras",
-        icon: "facetime-video",
-        id: "cameras",
-        controller: cameras
-    },
-    {
-        title: "settings",
-        icon: "cog",
-        id: "settings",
-        controller: settings
-    },
-    {
-        title: "profile",
-        icon: "user",
-        id: "profile",
-        controller: profile
-    },
-    {
-        title: "logout",
-        icon: "log-out",
-        controller: logout
-    }
-]
-
-$(document).ready(function () {
-
-    addPageLinks(pages)
-    setPage(pages[0])();
-
-    /**
-     * Handle socket events
-     */
-    controller = io.connect('/controller');
-    controller
-        .on('connect', function (socket) {
-            console.log("Controller connected");
-        })
-        .on('status', function (status) {
-            console.log("Got status for " + status.id + " - " + status.status)
-            setStatus(status.id, status.status);
-        })
-        .on('alarm', function (alarm) {
-            console.log("Got alarm signal for camera " + alarm.id + " - " + alarm.type);
-            setAlarm(alarm.id, alarm);
-        })
-        .on('thumbnail', function (image) {
-            console.log("Got image from camera " + image.id);
-            // set thumbnail to image
-            setThumbnail(image.id, image.alarmId, image.src);
-        })
-        .on('list', function (cameras) {
-            cameraList = cameras;
-            listCameras(cameras);
-        })
-        .on('mjpeg', function (url) {
-            setMjpeg(url.id, url.alarmId, url.src);
-            console.log("Got MJPEG URL " + url);
-        })
-
-})
