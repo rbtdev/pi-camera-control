@@ -54,7 +54,9 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser());
 
 // Serve static assets
-app.use(express.static(__dirname + '/public'));
+var static = path.join(__dirname, '../client');
+app.use(express.static(static));
+console.log("Serving static from " + static);
 
 // Set up routes
 app.use('/', routes);

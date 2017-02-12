@@ -1,2 +1,2 @@
-web: bin/www
-debug: node --debug bin/www
+web: server/bin/www
+debug: node --debug server/bin/www
