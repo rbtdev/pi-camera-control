@@ -10,7 +10,7 @@ slack = new Slack();
 slack.setWebhook(process.env.SLACK_WEBHOOK_URL);
 
 
-var publicDir = "public";
+var publicDir = "../client";
 var imageDir = "images";
 
 function controller(server) {
