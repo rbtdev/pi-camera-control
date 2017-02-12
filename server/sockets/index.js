@@ -10,7 +10,7 @@ slack = new Slack();
 slack.setWebhook(process.env.SLACK_WEBHOOK_URL);
 
 
-var publicDir = "../client";
+var publicDir = path.join('../client');
 var imageDir = "images";
 
 function controller(server) {
@@ -117,8 +117,8 @@ function controller(server) {
     return function (stream, data, cb) {
       // save frame in timestamp mjpeg dir
       var filename = path.basename(data.name);
-      var localDir = publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/mjpeg/";
-      var fullPath = localDir + filename;
+      var localDir = path.join(publicDir, imageDir, "/capture/", data.timestamp, "/mjpeg/");
+      var fullPath = path.join(localDir, filename);
       stream.on('finish', function () {});
       stream.pipe(fs.createWriteStream(fullPath, {
         mode: "0666"
@@ -145,13 +145,13 @@ function controller(server) {
     return function (stream, data, cb) {
       var camera = Cameras.findBySocket(socket);
       var filename = "thumb_" + path.basename(data.name);
-      var localDir = publicDir + "/" + imageDir + "/capture/" + data.timestamp + "/";
+      var localDir = path.join(publicDir, imageDir, "/capture/", data.timestamp);
       var url = createThumbnailUrl(data.timestamp, filename);
       camera.setThumbnailUrl(data.timestamp, url);
-      var fullPath = publicDir + url;
+      var fullPath = path.join(publicDir, url);
       try {
         fs.mkdirSync(localDir);
-        fs.mkdirSync(localDir + "/mjpeg");
+        fs.mkdirSync(path.join(localDir, "/mjpeg"));
       } catch (e) {
         return console.log("Error creating directories.");
       }
