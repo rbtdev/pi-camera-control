@@ -18,6 +18,7 @@ module.exports = [{
     {
         title: "logout",
         icon: "log-out",
+        id: "logout",
         controller: require('./logout'),
     }
 ];

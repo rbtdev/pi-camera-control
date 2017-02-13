@@ -1,28 +1,26 @@
-require('./bootstrap_hack');
+require('./bootstrap_hack'); // Needed to let bootstrap.js see jquery
 var $ = require('jquery');
 var pages = require('./pages');
 var cameras = require('./pages/cameras');
+var templates = require('./templates');
 
 
 function addPageLinks(pages) {
-    var navList = $('#myNavbar').find("ul");
+    $('#navbar').append(templates.navbar({
+        pages: pages
+    }));
     pages.forEach(function (page) {
-        var linkHtml = '<li><a id="' + page.title + '-nav" class = "nav-link" href="#">' +
-            '<span class="glyphicon glyphicon-' + page.icon + '"></span> ' + page.title + '</a>'
-        var link = $(linkHtml);
-        if (page.id) addPageHtml(page.id);
-        link.on('click', setPage(page));
-        navList.append(link);
+        $('#' + page.id + '-nav-link').on('click', setPage(page));
+        addPage(page.id);
     })
 
-
-    function addPageHtml(id) {
+    function addPage(id) {
         var html = "<div id='" + id + "-page' class='container-fluid page'>" +
             "<div class='row'>" +
             "<div id='" + id + "' class='col-xs-12'></div>" +
             "</div>" +
             "</div>";
-        $('#app').append(html);
+        $('#pages').append(html);
     }
 }
 
