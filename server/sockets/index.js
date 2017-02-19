@@ -130,15 +130,16 @@ function controller(server) {
   function sendAlarm(socket) {
     return function (alarm) {
       var camera = Cameras.findBySocket(socket);
-      camera.addAlarm({
-        type: alarm.type,
-        timestamp: alarm.timestamp
+      // add alarm to database
+      alarm.camera_id = camera.id;
+      alarms.add(alarm, function (err, alarm) {
+        if (err) return console.log("Error saving alarm to Db");
+        camera.addAlarm({
+          type: alarm.type,
+          timestamp: alarm.timestamp
+        })
+        clientIo.emit('alarm', alarm);
       })
-      clientIo.emit('alarm', {
-        id: camera.id,
-        type: alarm.type,
-        timestamp: alarm.timestamp
-      });
     }
   }
 

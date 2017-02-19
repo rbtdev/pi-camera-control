@@ -19,8 +19,8 @@ module.exports.listen = function listen() {
             setStatus(status.id, status.status);
         })
         .on('alarm', function (alarm) {
-            console.log("Got alarm signal for camera " + alarm.id + " - " + alarm.type);
-            setAlarm(alarm.id, alarm);
+            console.log("Got alarm signal for camera " + alarm.camera_id + " - " + alarm.type);
+            setAlarm(alarm.camera_id, alarm);
         })
         .on('thumbnail', function (image) {
             console.log("Got image from camera " + image.id);
@@ -95,7 +95,8 @@ function sendCapture() {
     })
 }
 
-function setAlarm(cameraId, alarm) {
+function setAlarm(alarm) {
+    var cameraId = alarm.camera_id;
     var id = "#camera-" + cameraId;
     var $alarms = $(id).find('.alarms');
     var $alarmItem = $('<div>', {
