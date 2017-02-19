@@ -24001,6 +24001,7 @@ $(document).ready(function () {
 },{"./bootstrap_hack":49,"./pages":52,"./pages/cameras":51,"./templates":56,"jquery":45}],51:[function(require,module,exports){
 var moment = require('moment');
 var $ = require('jquery');
+var template = require('../templates').pages.cameras;
 
 var controller;
 
@@ -24040,77 +24041,19 @@ module.exports.listen = function listen() {
 var cameraList = {};
 
 function listCameras(cameras) {
-    $('#camera-list').remove();
-    $('#cameras').append("<div id = 'camera-list'></div>");
-
-    for (cameraId in cameras) {
-        var $cameraRow = cameraRow(cameraId);
-        $('#camera-list').append($cameraRow)
-        updateCameraRow(cameraId);
-    }
-}
-
-function cameraRow(cameraId) {
-    var $cameraRow = $("<div>", {
-        id: "camera-" + cameraId,
-        class: "row"
+    var html = template({
+        cameras: cameras
     });
-    var $statusRow = $('<div>', {
-        class: 'row'
-    });
-    var $cameraName = $("<div>", {
-        class: "col-xs-8 name"
-    });
-    var $buttonCol = $("<div>", {
-        class: "col-xs-12 col-sm-6 col-md-2 col-lg-2"
-    });
-    var $speakRow = $("<div>", {
-        class: 'row'
+    $('#cameras-list').remove();
+    $('#cameras').append(html);
+    //attach click events
+    $('#cameras').find('.status').on('click', toggleStatus);
+    $('#cameras').find('.capture').on('click', sendCapture);
+    $('#cameras').find('.speak').on('click', sendSpeach);
+    cameras.forEach(function (camera) {
+        setStatus(camera.id, camera.status);
     })
-    var $speakText = $("<input>", {
-        id: cameraId + "-speak-text",
-        type: "text"
-    });
-    var $speakButton = $("<button>", {
-        type: "button",
-        'data-camera-id': cameraId,
-        text: "Speak"
-    });
-    var $alarmsRow = $('<div>', {
-        class: 'row'
-    });
-    var $alarms = $('<div>', {
-        class: 'col-xs-12 alarms'
-    });
-    var $cameraButton = $(
-        '<a href="#" class="btn btn-default btn-lg status">' +
-        '<span class="glyphicon glyphicon-off"></span>' +
-        '</a>')
-    $cameraButton.attr('data-camera-id', cameraId);
-
-    var $captureButton = $(
-        '<a href="#" class="btn btn-default btn-lg capture">' +
-        '<span class="glyphicon glyphicon-facetime-video"></span>' +
-        '</a>')
-    $captureButton.attr('data-camera-id', cameraId);
-
-    $cameraButton.click(toggleStatus);
-    $captureButton.click(sendCapture);
-    $speakButton.click(sendSpeach);
-    $buttonCol.append($cameraButton);
-    $buttonCol.append($captureButton);
-    $speakRow.append($speakText);
-    $speakRow.append($speakButton);
-    $alarmsRow.append($alarms);
-    $statusRow.append($cameraName);
-    $statusRow.append($buttonCol);
-    $cameraRow.append($statusRow);
-    $cameraRow.append($speakRow);
-    $cameraRow.append($alarmsRow);
-
-    return $cameraRow;
-};
-
+}
 
 
 function updateCameraRow(cameraId) {
@@ -24221,22 +24164,22 @@ function setStatus(cameraId, status) {
 
         'active': {
             class: 'btn-success',
-            text: 'ON'
+            text: 'ON',
         },
 
         'disabled': {
             class: 'btn-danger',
-            text: "OFF"
+            text: "OFF",
         }
     }
     var btnStatus = buttonClasses[status].class;
     var btnClass = "btn btn-default btn-lg " + btnStatus + " status";
     var btnText = buttonClasses[status].text;
+    debugger
     var $statusBtn = $(id).find('.status');
-    //$statusBtn("<a>").text(btnText);
     $statusBtn.attr('class', btnClass);
 }
-},{"jquery":45,"moment":46}],52:[function(require,module,exports){
+},{"../templates":56,"jquery":45,"moment":46}],52:[function(require,module,exports){
 module.exports = [{
         title: "cameras",
         icon: "facetime-video",
@@ -24320,8 +24263,38 @@ var Handlebars = require("handlebars");
     + "            </ul>\n        </div>\n    </div>\n</nav>";
 },"useData":true});
 exports["pages"] = exports["pages"] || {};
-exports["pages"]["cameras"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-    return "";
+exports["pages"]["cameras"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, alias1=this.lambda, alias2=this.escapeExpression;
+
+  return "    <div id=\"camera-"
+    + alias2(alias1((depth0 != null ? depth0.id : depth0), depth0))
+    + "\" class=\"row\">\n        <div class=\"row\">\n            <div class=\"col-xs-8 name\">My Pi</div>\n            <div class=\"col-xs-12 col-sm-6 col-md-2 col-lg-2\">\n                <a href=\"#\" class=\"btn btn-default btn-lg btn-danger status\" data-camera-id=\""
+    + alias2(alias1((depth0 != null ? depth0.id : depth0), depth0))
+    + "\"><span class = 'glyphicon glyphicon-off'></span></a>\n                <a href=\"#\" class=\"btn btn-default btn-lg capture\" data-camera-id=\""
+    + alias2(alias1((depth0 != null ? depth0.id : depth0), depth0))
+    + "\"><span class=\"glyphicon glyphicon-facetime-video\"></span></a>\n            </div>\n        </div>\n        <div class=\"row\"><input id=\""
+    + alias2(alias1((depth0 != null ? depth0.id : depth0), depth0))
+    + "-speak-text\" type=\"text\"><button type=\"button\" class='speak' data-camera-id=\""
+    + alias2(alias1((depth0 != null ? depth0.id : depth0), depth0))
+    + "\">Speak</button></div>\n        <div class=\"row\">\n            <div class=\"col-xs-12 alarms\">\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.alarms : depth0),{"name":"each","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "            </div>\n        </div>\n    </div>\n";
+},"2":function(depth0,helpers,partials,data) {
+    var helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
+
+  return "                <div id=\"alarm-"
+    + alias3(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" class=\"row alarm\">\n                    <div class=\"col-xs-8 timestamp\">"
+    + alias3(((helper = (helper = helpers.timestamp || (depth0 != null ? depth0.timestamp : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"timestamp","hash":{},"data":data}) : helper)))
+    + "</div>\n                    <div class=\"col-xs-4\">\n                        <a class=\"mjpeg-link\"><img class=\"alarm-image thumbnail\" src=\""
+    + alias3(((helper = (helper = helpers.thumbUrl || (depth0 != null ? depth0.thumbUrl : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"thumbUrl","hash":{},"data":data}) : helper)))
+    + "\"></a>\n                    </div>\n                </div>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "<div id=\"camera-list\">\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.cameras : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "</div>";
 },"useData":true});
 exports["pages"]["profile"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
     var stack1, alias1=this.lambda, alias2=this.escapeExpression;

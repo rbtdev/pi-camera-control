@@ -1,5 +1,6 @@
 var moment = require('moment');
 var $ = require('jquery');
+var template = require('../templates').pages.cameras;
 
 var controller;
 
@@ -39,77 +40,19 @@ module.exports.listen = function listen() {
 var cameraList = {};
 
 function listCameras(cameras) {
-    $('#camera-list').remove();
-    $('#cameras').append("<div id = 'camera-list'></div>");
-
-    for (cameraId in cameras) {
-        var $cameraRow = cameraRow(cameraId);
-        $('#camera-list').append($cameraRow)
-        updateCameraRow(cameraId);
-    }
-}
-
-function cameraRow(cameraId) {
-    var $cameraRow = $("<div>", {
-        id: "camera-" + cameraId,
-        class: "row"
+    var html = template({
+        cameras: cameras
     });
-    var $statusRow = $('<div>', {
-        class: 'row'
-    });
-    var $cameraName = $("<div>", {
-        class: "col-xs-8 name"
-    });
-    var $buttonCol = $("<div>", {
-        class: "col-xs-12 col-sm-6 col-md-2 col-lg-2"
-    });
-    var $speakRow = $("<div>", {
-        class: 'row'
+    $('#cameras-list').remove();
+    $('#cameras').append(html);
+    //attach click events
+    $('#cameras').find('.status').on('click', toggleStatus);
+    $('#cameras').find('.capture').on('click', sendCapture);
+    $('#cameras').find('.speak').on('click', sendSpeach);
+    cameras.forEach(function (camera) {
+        setStatus(camera.id, camera.status);
     })
-    var $speakText = $("<input>", {
-        id: cameraId + "-speak-text",
-        type: "text"
-    });
-    var $speakButton = $("<button>", {
-        type: "button",
-        'data-camera-id': cameraId,
-        text: "Speak"
-    });
-    var $alarmsRow = $('<div>', {
-        class: 'row'
-    });
-    var $alarms = $('<div>', {
-        class: 'col-xs-12 alarms'
-    });
-    var $cameraButton = $(
-        '<a href="#" class="btn btn-default btn-lg status">' +
-        '<span class="glyphicon glyphicon-off"></span>' +
-        '</a>')
-    $cameraButton.attr('data-camera-id', cameraId);
-
-    var $captureButton = $(
-        '<a href="#" class="btn btn-default btn-lg capture">' +
-        '<span class="glyphicon glyphicon-facetime-video"></span>' +
-        '</a>')
-    $captureButton.attr('data-camera-id', cameraId);
-
-    $cameraButton.click(toggleStatus);
-    $captureButton.click(sendCapture);
-    $speakButton.click(sendSpeach);
-    $buttonCol.append($cameraButton);
-    $buttonCol.append($captureButton);
-    $speakRow.append($speakText);
-    $speakRow.append($speakButton);
-    $alarmsRow.append($alarms);
-    $statusRow.append($cameraName);
-    $statusRow.append($buttonCol);
-    $cameraRow.append($statusRow);
-    $cameraRow.append($speakRow);
-    $cameraRow.append($alarmsRow);
-
-    return $cameraRow;
-};
-
+}
 
 
 function updateCameraRow(cameraId) {
@@ -220,18 +163,18 @@ function setStatus(cameraId, status) {
 
         'active': {
             class: 'btn-success',
-            text: 'ON'
+            text: 'ON',
         },
 
         'disabled': {
             class: 'btn-danger',
-            text: "OFF"
+            text: "OFF",
         }
     }
     var btnStatus = buttonClasses[status].class;
     var btnClass = "btn btn-default btn-lg " + btnStatus + " status";
     var btnText = buttonClasses[status].text;
+    debugger
     var $statusBtn = $(id).find('.status');
-    //$statusBtn("<a>").text(btnText);
     $statusBtn.attr('class', btnClass);
 }

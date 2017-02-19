@@ -1,0 +1,26 @@
+<div id="camera-list">
+    {{#each cameras}}
+    <div id="camera-{{this.id}}" class="row">
+        <div class="row">
+            <div class="col-xs-8 name">My Pi</div>
+            <div class="col-xs-12 col-sm-6 col-md-2 col-lg-2">
+                <a href="#" class="btn btn-default btn-lg btn-danger status" data-camera-id="{{this.id}}"><span class = 'glyphicon glyphicon-off'></span></a>
+                <a href="#" class="btn btn-default btn-lg capture" data-camera-id="{{this.id}}"><span class="glyphicon glyphicon-facetime-video"></span></a>
+            </div>
+        </div>
+        <div class="row"><input id="{{this.id}}-speak-text" type="text"><button type="button" class='speak' data-camera-id="{{this.id}}">Speak</button></div>
+        <div class="row">
+            <div class="col-xs-12 alarms">
+                {{#each this.alarms}}
+                <div id="alarm-{{id}}" class="row alarm">
+                    <div class="col-xs-8 timestamp">{{timestamp}}</div>
+                    <div class="col-xs-4">
+                        <a class="mjpeg-link"><img class="alarm-image thumbnail" src="{{thumbUrl}}"></a>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
